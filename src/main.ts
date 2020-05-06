@@ -4,7 +4,7 @@ import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const port = 8080;
+  const port = 4000;
 
   const app = await NestFactory.create(AppModule);
 

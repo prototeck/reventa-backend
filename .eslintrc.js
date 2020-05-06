@@ -25,6 +25,7 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     'import/prefer-default-export': 0,
+    'no-useless-constructor': 0,
     'import/order': ['error', {'newlines-between': 'always'}]
   },
 };
