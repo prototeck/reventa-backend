@@ -8,6 +8,8 @@ RUN npm install --only=development
 
 COPY . .
 
+EXPOSE 4000
+
 RUN npm run build
 
 FROM node:12.13-alpine as production

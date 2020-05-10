@@ -11,9 +11,6 @@ async function bootstrap() {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-  console.log('env', process.env.NODE_ENV)
-  console.log('port', process.env.PORT)
-
   await app.listen(process.env.PORT || port);
 }
 bootstrap();
