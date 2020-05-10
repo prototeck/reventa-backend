@@ -15,6 +15,10 @@ const USER_ERRORS = {
 export class UserService {
   constructor(@InjectModel('User') private UserModel: Model<User>) {}
 
+  /**
+   * * finds all the users in the database
+   * @returns an array of all the User type records
+   */
   async findAll(): Promise<IUser[]> {
     try {
       const users = await this.UserModel.find({}).lean();
@@ -25,6 +29,13 @@ export class UserService {
     }
   }
 
+  /**
+   * * create a new user in the database from the provided input
+   * @param input - user details input object
+   * @returns new User type record
+   *
+   * @public
+   */
   async createUser(input: CreateUserInput) {
     try {
       const existingUser = await this.UserModel.findOne({ email: input.email });

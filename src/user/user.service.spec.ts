@@ -48,42 +48,65 @@ describe('UserService', () => {
     expect(service).toBeDefined();
   });
 
-  it('should call UserModel.findOne to check existing user', async done => {
-    const createInput: CreateUserInput = {
-      firstName: 'Aditya',
-      lastName: 'Loshali',
-      email: 'aditya.loshali@gmail.com',
-    };
-
-    jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
-
-    await service.createUser(createInput);
-
-    expect(UserModelMock.findOne).toHaveBeenCalledWith({
-      email: createInput.email,
+  describe('create user function', () => {
+    beforeEach(() => {
+      jest.resetAllMocks();
     });
 
-    done();
-  });
+    it('should call UserModel.findOne to check existing user', async done => {
+      const createInput: CreateUserInput = {
+        firstName: 'Aditya',
+        lastName: 'Loshali',
+        email: 'aditya.loshali@gmail.com',
+      };
 
-  it('should throw error when an user with same email exists', async done => {
-    const createInput: CreateUserInput = {
-      firstName: 'Aditya',
-      lastName: 'Loshali',
-      email: 'aditya.loshali@gmail.com',
-    };
+      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
 
-    jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(createInput);
+      await service.createUser(createInput);
 
-    service
-      .createUser(createInput)
-      .then(() => done.fail())
-      .catch(error => {
-        expect(error).toBeInstanceOf(HttpException);
-        expect(error.status).toBe(HttpStatus.CONFLICT);
-        expect(error.message).toContain('exists');
-
-        done();
+      expect(UserModelMock.findOne).toHaveBeenCalledWith({
+        email: createInput.email,
       });
+
+      done();
+    });
+
+    it('should throw error when an user with same email exists', async done => {
+      const createInput: CreateUserInput = {
+        firstName: 'Aditya',
+        lastName: 'Loshali',
+        email: 'aditya.loshali@gmail.com',
+      };
+
+      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(createInput);
+
+      service
+        .createUser(createInput)
+        .then(() => done.fail('did not throw any error'))
+        .catch(error => {
+          expect(error).toBeInstanceOf(HttpException);
+          expect(error.status).toBe(HttpStatus.CONFLICT);
+          expect(error.message).toContain('exists');
+
+          done();
+        });
+    });
+
+    // it('should throw error when the input email is wrong', done => {
+    //   const createInput: CreateUserInput = {
+    //     firstName: 'Aditya',
+    //     lastName: 'Loshali',
+    //     email: 'aditya.loshali',
+    //   };
+
+    //   service
+    //     .createUser(createInput)
+    //     .then(() => done.fail('did not throw any error'))
+    //     .catch(error => {
+    //       console.log(error);
+
+    //       done();
+    //     });
+    // });
   });
 });
