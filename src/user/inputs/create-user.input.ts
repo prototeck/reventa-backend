@@ -2,7 +2,7 @@ import { InputType, Field } from '@nestjs/graphql';
 import { IsAlpha, IsEmail } from 'class-validator';
 
 /**
- * defines the input schema for user creation
+ * * defines the input schema for user creation
  */
 @InputType()
 export class CreateUserInput {
