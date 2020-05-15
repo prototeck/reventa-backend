@@ -4,6 +4,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { CreateUserInput } from './inputs/create-user.input';
+import { IUser } from './interfaces/user.interface';
 
 class UserModelMock {
   data: any;
@@ -46,6 +47,27 @@ describe('UserService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('find all function', () => {
+    let result: IUser[];
+
+    beforeEach(async () => {
+      const mockedWithLean = () => ({ lean: jest.fn(() => []) });
+
+      jest.spyOn(UserModelMock, 'find').mockImplementationOnce(mockedWithLean);
+
+      result = await service.findAll();
+    });
+
+    it('should return the result array', async () => {
+      expect(result).toBeInstanceOf(Array);
+      expect(result.length).toEqual(0);
+    });
+
+    it('should call the UserModel.find method', async () => {
+      expect(UserModelMock.find).toHaveBeenCalled();
+    });
   });
 
   describe('create user function', () => {
