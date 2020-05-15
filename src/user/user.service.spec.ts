@@ -17,13 +17,11 @@ class UserModelMock {
     return this.data;
   }
 
-  static findOne: jest.Mock<any> = jest.fn(() => ({ lean: jest.fn() }));
+  static findOne: jest.Mock<any> = jest.fn(() => []);
 
-  static find: jest.Mock<any> = jest.fn(() => ({ lean: jest.fn() }));
+  static find: jest.Mock<any> = jest.fn(() => []);
 
-  static findOneAndUpdate: jest.Mock<any> = jest.fn(() => ({
-    lean: jest.fn(),
-  }));
+  static findOneAndUpdate: jest.Mock<any> = jest.fn(() => []);
 
   static updateMany: jest.Mock<any> = jest.fn();
 }
@@ -51,22 +49,31 @@ describe('UserService', () => {
 
   describe('find all function', () => {
     let result: IUser[];
+    let mockedLean: jest.Mock<any[]>;
 
     beforeEach(async () => {
-      const mockedWithLean = () => ({ lean: jest.fn(() => []) });
+      // mocked lean function
+      mockedLean = jest.fn(() => []);
+
+      // find function implementation with reference to mocked lean
+      const mockedWithLean = () => ({ lean: mockedLean });
 
       jest.spyOn(UserModelMock, 'find').mockImplementationOnce(mockedWithLean);
 
       result = await service.findAll();
     });
 
-    it('should return the result array', async () => {
+    it('should return the result array', () => {
       expect(result).toBeInstanceOf(Array);
       expect(result.length).toEqual(0);
     });
 
-    it('should call the UserModel.find method', async () => {
+    it('should call the UserModel.find method', () => {
       expect(UserModelMock.find).toHaveBeenCalled();
+    });
+
+    it('should call find.lean method', () => {
+      expect(mockedLean).toHaveBeenCalled();
     });
   });
 
