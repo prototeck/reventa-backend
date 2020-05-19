@@ -6,6 +6,7 @@ import { makeError } from '../utils';
 
 import { User, IUser } from './interfaces/user.interface';
 import { CreateUserInput } from './inputs/create-user.input';
+import { UpdateUserInput } from './inputs/update-user.input';
 
 const USER_ERRORS = {
   USER_EXISTS: 'an user with the email already exists',
@@ -13,7 +14,7 @@ const USER_ERRORS = {
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private UserModel: Model<User>) {}
+  constructor(@InjectModel('User') private UserModel: Model<User>) { }
 
   /**
    * * finds all the users in the database
@@ -22,9 +23,10 @@ export class UserService {
   async findAll(): Promise<IUser[]> {
     try {
       const users = await this.UserModel.find({}).lean();
-
+      console.log('users', users);
       return users;
     } catch (error) {
+      console.log('errorrrr', error);
       throw makeError(error);
     }
   }
@@ -47,6 +49,48 @@ export class UserService {
       const user = await new this.UserModel({ ...input }).save();
 
       return user;
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
+  /**
+   * * update an existing User in the database
+   * @param input - existing user details
+   * @returns updated User type record
+   *
+   * @public
+   */
+  async updateUser(id: string, updateInput: UpdateUserInput) {
+    try {
+      const updatedUser = await this.UserModel.findOneAndUpdate(
+        {
+          _id: id,
+        },
+        {
+          $set: { ...updateInput },
+        },
+        {
+          new: true,
+        },
+      );
+      return updatedUser;
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
+  /**
+   * delete an existing user in the database
+   * @param userId - id of the user to be deleted
+   * @returns - deleted user
+   */
+  async deleteUser(id: string): Promise<IUser> {
+    try {
+      const deletedUser = await this.UserModel.findOneAndDelete({
+        _id: id,
+      });
+      return deletedUser;
     } catch (error) {
       throw makeError(error);
     }

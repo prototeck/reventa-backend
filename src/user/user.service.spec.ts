@@ -4,6 +4,7 @@ import { HttpException, HttpStatus } from '@nestjs/common';
 
 import { UserService } from './user.service';
 import { CreateUserInput } from './inputs/create-user.input';
+import { UpdateUserInput } from './inputs/update-user.input';
 
 class UserModelMock {
   data: any;
@@ -25,6 +26,10 @@ class UserModelMock {
   }));
 
   static updateMany: jest.Mock<any> = jest.fn();
+
+  static findOneAndDelete: jest.Mock<any> = jest.fn(() => ({
+    lean: jest.fn(),
+  }));
 }
 
 describe('UserService', () => {
@@ -108,5 +113,88 @@ describe('UserService', () => {
     //       done();
     //     });
     // });
+  });
+  // describe('get all users function', () => {
+  //   beforeEach(() => {
+  //     jest.restoreAllMocks();
+  //   });
+
+  //   it('should call UserModel.findall to get all users', async done =>{
+  //     const userArray =
+  //   })
+  // }
+  describe('update user function', () => {
+    beforeEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should call UserModel.findOne to check existing user', async done => {
+      const createInput: CreateUserInput = {
+        firstName: 'Aditya',
+        lastName: 'Loshali',
+        email: 'aditya.loshali@gmail.com',
+      };
+
+      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(createInput);
+
+      expect(UserModelMock.findOne).toHaveBeenCalledWith({
+        email: createInput.email,
+      });
+      done();
+    });
+
+    it('should call UserModel.findOneAndUpdate to update user', async done => {
+      const id = '1';
+      const updateInput: UpdateUserInput = {
+        firstName: 'aditya',
+        lastName: 'loshali',
+      };
+
+      jest
+        .spyOn(UserModelMock, 'findOneAndUpdate')
+        .mockResolvedValue(updateInput);
+
+      await service.updateUser(id, updateInput);
+
+      expect(UserModelMock.findOneAndUpdate).toHaveBeenCalledWith(
+        { _id: id },
+        { $set: { ...updateInput } },
+        { new: true },
+      );
+      done();
+    });
+  });
+
+  describe('delete user function', () => {
+    beforeEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should call UserModel.findOne to check existing user', async done => {
+      const createInput: CreateUserInput = {
+        firstName: 'Aditya',
+        lastName: 'Loshali',
+        email: 'aditya.loshali@gmail.com',
+      };
+
+      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(createInput);
+
+      expect(UserModelMock.findOne).toHaveBeenCalledWith({
+        email: createInput.email,
+      });
+      done();
+    });
+    it('should call UserModel.findOneAndDelete to delete user', async done => {
+      const id = '1';
+
+      jest.spyOn(UserModelMock, 'findOneAndDelete').mockResolvedValue(id);
+
+      await service.deleteUser(id);
+
+      expect(UserModelMock.findOneAndDelete).toHaveBeenCalledWith({
+        _id: id,
+      });
+      done();
+    });
   });
 });
