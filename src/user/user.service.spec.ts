@@ -2,6 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { Types } from 'mongoose';
 
 import { AuthenticationService } from '../authentication/authentication.service';
 
@@ -29,14 +30,9 @@ class UserModelMock {
   static updateMany: jest.Mock<any> = jest.fn();
 }
 
-class AuthenticationServiceMock {
-  userSignup = jest.fn();
-
-  confirmCode = jest.fn();
-}
-
 describe('UserService', () => {
   let service: UserService;
+  let spyAuthenticationService: AuthenticationService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -48,12 +44,18 @@ describe('UserService', () => {
         },
         {
           provide: AuthenticationService,
-          useValue: AuthenticationServiceMock,
+          useFactory: () => ({
+            userSignup: jest.fn(),
+            confirmCode: jest.fn(),
+          }),
         },
       ],
     }).compile();
 
     service = module.get<UserService>(UserService);
+    spyAuthenticationService = module.get<AuthenticationService>(
+      AuthenticationService,
+    );
   });
 
   it('should be defined', () => {
@@ -90,29 +92,43 @@ describe('UserService', () => {
     });
   });
 
-  describe('find by email function', async () => {
+  describe('find by email function', () => {
     const email = 'aditya.loshali@gmail.com';
+    let mockedLean: jest.Mock<any>;
 
-    jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+    beforeEach(async () => {
+      mockedLean = jest.fn(() => undefined);
 
-    await service.findByEmail(email);
+      // findOne function implementation with reference to mocked lean
+      const mockedWithLean = () => ({ lean: mockedLean });
 
-    expect(UserModelMock.findOne).toHaveBeenCalledWith({ email });
+      jest.spyOn(UserModelMock, 'findOne').mockImplementation(mockedWithLean);
+
+      await service.findByEmail(email);
+    });
+
+    it('should call the UserModel.findOne method', () => {
+      expect(UserModelMock.findOne).toHaveBeenCalledWith({ email });
+    });
+
+    it('should call findOne.lean method', () => {
+      expect(mockedLean).toHaveBeenCalled();
+    });
   });
 
   describe('create user function', () => {
+    const createInput: CreateUserInput = {
+      firstName: 'Aditya',
+      lastName: 'Loshali',
+      email: 'aditya.loshali@gmail.com',
+      password: 'Gibberish@123',
+    };
+
     beforeEach(() => {
       jest.resetAllMocks();
     });
 
     it('should call service.findByEmail to check existing user', async done => {
-      const createInput: CreateUserInput = {
-        firstName: 'Aditya',
-        lastName: 'Loshali',
-        email: 'aditya.loshali@gmail.com',
-        password: 'Gibberish@123',
-      };
-
       jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
 
       await service.createUser(createInput);
@@ -123,16 +139,9 @@ describe('UserService', () => {
     });
 
     it('should throw error when an user with same email exists', async done => {
-      const createInput: CreateUserInput = {
-        firstName: 'Aditya',
-        lastName: 'Loshali',
-        email: 'aditya.loshali@gmail.com',
-        password: 'Gibberish@123',
-      };
-
       jest
         .spyOn(service, 'findByEmail')
-        .mockImplementation(async () => createInput as any as User);
+        .mockImplementation(async () => (createInput as any) as IUser);
 
       service
         .createUser(createInput)
@@ -146,21 +155,32 @@ describe('UserService', () => {
         });
     });
 
-    // it('should throw error when the input email is wrong', done => {
-    //   const createInput: CreateUserInput = {
-    //     firstName: 'Aditya',
-    //     lastName: 'Loshali',
-    //     email: 'aditya.loshali',
-    //   };
+    describe('when called with correct data', () => {
+      const mongoId = Types.ObjectId();
+      let result: IUser;
 
-    //   service
-    //     .createUser(createInput)
-    //     .then(() => done.fail('did not throw any error'))
-    //     .catch(error => {
-    //       console.log(error);
+      beforeEach(async () => {
+        jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+        jest
+          .spyOn(UserModelMock.prototype, 'save')
+          .mockResolvedValue({ _id: mongoId, ...createInput });
 
-    //       done();
-    //     });
-    // });
+        result = await service.createUser(createInput);
+      });
+
+      it('should call the UserModel save method and return correct result', () => {
+        expect(UserModelMock.prototype.save).toHaveBeenCalled();
+        expect(result).toMatchObject(createInput);
+        // eslint-disable-next-line no-underscore-dangle
+        expect(result._id).toBeDefined();
+      });
+
+      it('should call AuthenticationService userSignup method with expected values', () => {
+        expect(spyAuthenticationService.userSignup).toBeCalledWith(
+          { _id: mongoId, ...createInput },
+          createInput.password,
+        );
+      });
+    });
   });
 });
