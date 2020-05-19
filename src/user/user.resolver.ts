@@ -3,6 +3,7 @@ import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 import { UserDTO } from './dto/user.dto';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UserService } from './user.service';
+import { ConfirmUserInput } from './inputs/confirm-user.input';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
@@ -20,5 +21,12 @@ export class UserResolver {
     const user = await this.userService.createUser(input);
 
     return user;
+  }
+
+  @Mutation(() => String)
+  async confirmUser(@Args('input') input: ConfirmUserInput) {
+    const result = await this.userService.confirmUser(input);
+
+    return result;
   }
 }

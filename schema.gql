@@ -17,10 +17,17 @@ type Query {
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
+  confirmUser(input: ConfirmUserInput!): String!
 }
 
 input CreateUserInput {
   firstName: String!
   lastName: String!
   email: String!
+  password: String!
+}
+
+input ConfirmUserInput {
+  email: String!
+  code: String!
 }

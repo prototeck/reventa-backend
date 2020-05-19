@@ -1,6 +1,9 @@
+/* eslint-disable max-classes-per-file */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
+
+import { AuthenticationService } from '../authentication/authentication.service';
 
 import { UserService } from './user.service';
 import { CreateUserInput } from './inputs/create-user.input';
@@ -26,6 +29,12 @@ class UserModelMock {
   static updateMany: jest.Mock<any> = jest.fn();
 }
 
+class AuthenticationServiceMock {
+  userSignup = jest.fn();
+
+  confirmCode = jest.fn();
+}
+
 describe('UserService', () => {
   let service: UserService;
 
@@ -36,6 +45,10 @@ describe('UserService', () => {
         {
           provide: getModelToken('User'),
           useValue: UserModelMock,
+        },
+        {
+          provide: AuthenticationService,
+          useValue: AuthenticationServiceMock,
         },
       ],
     }).compile();
@@ -77,25 +90,34 @@ describe('UserService', () => {
     });
   });
 
+  describe('find by email function', async () => {
+    const email = 'aditya.loshali@gmail.com';
+
+    jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+
+    await service.findByEmail(email);
+
+    expect(UserModelMock.findOne).toHaveBeenCalledWith({ email });
+  });
+
   describe('create user function', () => {
     beforeEach(() => {
       jest.resetAllMocks();
     });
 
-    it('should call UserModel.findOne to check existing user', async done => {
+    it('should call service.findByEmail to check existing user', async done => {
       const createInput: CreateUserInput = {
         firstName: 'Aditya',
         lastName: 'Loshali',
         email: 'aditya.loshali@gmail.com',
+        password: 'Gibberish@123',
       };
 
-      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
 
       await service.createUser(createInput);
 
-      expect(UserModelMock.findOne).toHaveBeenCalledWith({
-        email: createInput.email,
-      });
+      expect(service.findByEmail).toHaveBeenCalledWith(createInput.email);
 
       done();
     });
@@ -105,9 +127,12 @@ describe('UserService', () => {
         firstName: 'Aditya',
         lastName: 'Loshali',
         email: 'aditya.loshali@gmail.com',
+        password: 'Gibberish@123',
       };
 
-      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(createInput);
+      jest
+        .spyOn(service, 'findByEmail')
+        .mockImplementation(async () => createInput as any as User);
 
       service
         .createUser(createInput)
