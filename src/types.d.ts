@@ -5,4 +5,16 @@ export interface Config {
     uri: string;
     dbname: string;
   };
+  aws: {
+    common: {
+      region: string;
+      accessKeyId: string;
+      secretAccessKey: string;
+    };
+    cognito: {
+      poolRegion: string;
+      poolId: string;
+      clientId: string;
+    };
+  };
 }

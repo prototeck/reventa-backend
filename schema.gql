@@ -19,12 +19,19 @@ type Mutation {
   createUser(input: CreateUserInput!): User!
   updateUser(input: UpdateUserInput!, id: String!): User!
   deleteUser(id: String!): User!
+  confirmUser(input: ConfirmUserInput!): String!
 }
 
 input CreateUserInput {
   firstName: String!
   lastName: String!
   email: String!
+  password: String!
+}
+
+input ConfirmUserInput {
+  email: String!
+  code: String!
 }
 
 input UpdateUserInput {

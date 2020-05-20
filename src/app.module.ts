@@ -10,6 +10,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { Config } from './types.d';
+import { AuthenticationModule } from './authentication/authentication.module';
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -62,6 +63,7 @@ export const pubsub = new PubSub();
       },
     }),
     UserModule,
+    AuthenticationModule,
   ],
   controllers: [AppController],
   providers: [AppService],

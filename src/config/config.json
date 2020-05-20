@@ -3,12 +3,30 @@
     "mongo": {
       "uri": "mongodb+srv://reventa-admin:hardpassadmin@1@cluster0-5aqrf.gcp.mongodb.net/test?retryWrites=true&w=majority",
       "dbname": "reventa-dev"
+    },
+    "aws": {
+      "common": {
+        "region": "us-east-1",
+        "accessKeyId": "AKIASYAHBUCOE3K3VWFU",
+        "secretAccessKey": "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"
+      },
+      "cognito": {
+        "poolRegion": "us-east-1",
+        "poolId": "us-east-1_JKHkFhGTa",
+        "clientId": "6usvd6jk2qq37cmnnp3871uue1"
+      }
     }
   },
   "test": {
     "mongo": {
       "uri": "mongodb+srv://reventa-admin:hardpassadmin@1@cluster0-5aqrf.gcp.mongodb.net/test?retryWrites=true&w=majority",
       "dbname": "reventa-dev"
+    },
+    "aws": {
+      "common": {
+        "accessKeyId": "AKIASYAHBUCOE3K3VWFU",
+        "secretAccessKey": "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"
+      }
     }
   }
 }

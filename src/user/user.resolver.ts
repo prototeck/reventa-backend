@@ -1,9 +1,12 @@
 import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 
 import { UserDTO } from './dto/user.dto';
+import { LoginUserDTO } from './dto/loginUser.dto';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
 import { UserService } from './user.service';
+import { ConfirmUserInput } from './inputs/confirm-user.input';
+import { LoginUserInput } from './inputs/login-user.input';
 
 @Resolver(() => UserDTO)
 export class UserResolver {
@@ -38,5 +41,19 @@ export class UserResolver {
     const deletedUser = await this.userService.deleteUser(id);
 
     return deletedUser;
+  }
+
+  @Mutation(() => String)
+  async confirmUser(@Args('input') input: ConfirmUserInput) {
+    const result = await this.userService.confirmUser(input);
+
+    return result;
+  }
+
+  @Mutation(() => LoginUserDTO)
+  async signinUser(@Args('input') input: LoginUserInput) {
+    const result = await this.userService.loginUser(input);
+    console.log('result login', result)
+    return result;
   }
 }
