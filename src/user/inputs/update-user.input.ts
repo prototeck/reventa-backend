@@ -6,7 +6,6 @@ import { IsAlpha, IsEmail } from 'class-validator';
  */
 @InputType()
 export class UpdateUserInput {
-
     /** user's first name */
     @Field({ nullable: true })
     @IsAlpha()
@@ -16,5 +15,4 @@ export class UpdateUserInput {
     @Field({ nullable: true })
     @IsAlpha()
     readonly lastName?: string;
-
 }

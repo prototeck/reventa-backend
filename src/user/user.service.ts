@@ -6,7 +6,6 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { makeError } from '../utils';
 
 import { User, IUser } from './interfaces/user.interface';
-import { ILoginUser } from './interfaces/loginUser.interface';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
 import { ConfirmUserInput } from './inputs/confirm-user.input';
@@ -70,7 +69,6 @@ export class UserService {
       throw makeError(error);
     }
   }
-
 
   /**
    * * update an existing User in the database
@@ -136,6 +134,12 @@ export class UserService {
     }
   }
 
+  /**
+   * delete an existing user in the database
+   * @param userId - id of the user to be deleted
+   * @returns - deleted user
+   */
+
   async loginUser(input: LoginUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
@@ -146,13 +150,11 @@ export class UserService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const signinUser: ILoginUser = {
-        email: input.email,
-        password: input.password,
-      };
 
-      const result = await this.authenticationService.userSignin(signinUser);
-      console.log('result', result)
+      const result = await this.authenticationService.userSignin(
+        existingUser,
+        input.password,
+      );
 
       return result;
     } catch (error) {

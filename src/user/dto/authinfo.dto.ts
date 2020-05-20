@@ -1,8 +1,7 @@
 import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
 
-@ObjectType('User', { description: 'The User model' })
-export class LoginUserDTO {
-
+@ObjectType('LoginUser', { description: 'The LoginUser model' })
+export class AuthInfoDTO {
     @Field(() => ID)
     readonly idToken: string;
 

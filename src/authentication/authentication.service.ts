@@ -3,7 +3,6 @@ import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 import * as AWS from 'aws-sdk';
 
 import { IUser } from '../user/interfaces/user.interface';
-import { ILoginUser } from '../user/interfaces/loginUser.interface';
 
 export type CognitoUserAttribute = AmazonCognitoIdentity.CognitoUserAttribute;
 
@@ -64,17 +63,17 @@ export class AuthenticationService {
     });
   }
 
-  private signIn(loginUser: ILoginUser) {
+  private signIn(userId: string, password: string) {
     return new Promise((resolve, reject) => {
       const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
         {
-          Username: loginUser.email,
-          Password: loginUser.password,
+          Username: userId,
+          Password: password,
         },
       );
 
       const userData = {
-        Username: loginUser.email,
+        Username: userId,
         Pool: this.userPool,
       };
 
@@ -128,9 +127,10 @@ export class AuthenticationService {
     });
   }
 
-  public userSignin(loginUser: ILoginUser) {
+  public userSignin(user: IUser, password: string) {
     return new Promise((resolve, reject) => {
-      this.signIn(loginUser)
+      // eslint-disable-next-line no-underscore-dangle
+      this.signIn(user._id, password)
         .then(resolve)
         .catch(reject);
     });
