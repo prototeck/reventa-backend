@@ -53,6 +53,7 @@ describe('UserService', () => {
           useFactory: () => ({
             userSignup: jest.fn(),
             confirmCode: jest.fn(),
+
           }),
         },
       ],
@@ -210,12 +211,8 @@ describe('UserService', () => {
         email: 'aditya.loshali@gmail.com',
         password: 'Password@1',
       };
-      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
-
-      await service.createUser(createInput);
 
       expect(service.findByEmail).toHaveBeenCalledWith(createInput.email);
-
       done();
     });
 
@@ -255,7 +252,6 @@ describe('UserService', () => {
       };
       jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
 
-      await service.createUser(createInput);
 
       expect(service.findByEmail).toHaveBeenCalledWith(createInput.email);
 

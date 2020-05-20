@@ -17,8 +17,4 @@ export class UpdateUserInput {
     @IsAlpha()
     readonly lastName?: string;
 
-    /** user's email address */
-    @Field({ nullable: true })
-    @IsEmail()
-    readonly email?: string;
 }
