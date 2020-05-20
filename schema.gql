@@ -11,6 +11,13 @@ type User {
   createdOn: Float!
 }
 
+"""The User model"""
+type UserLog {
+  idToken: ID!
+  accessToken: String!
+  refreshToken: Float!
+}
+
 type Query {
   users: [User!]!
 }
@@ -20,6 +27,7 @@ type Mutation {
   updateUser(input: UpdateUserInput!, id: String!): User!
   deleteUser(id: String!): User!
   confirmUser(input: ConfirmUserInput!): String!
+  signinUser(input: LoginUserInput!): UserLog!
 }
 
 input CreateUserInput {
@@ -29,13 +37,18 @@ input CreateUserInput {
   password: String!
 }
 
+input UpdateUserInput {
+  firstName: String
+  lastName: String
+  email: String
+}
+
 input ConfirmUserInput {
   email: String!
   code: String!
 }
 
-input UpdateUserInput {
-  firstName: String
-  lastName: String
-  email: String
+input LoginUserInput {
+  email: String!
+  password: String!
 }
