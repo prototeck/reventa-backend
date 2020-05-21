@@ -8,8 +8,9 @@ import fetch from 'node-fetch';
 import configs from './config/config.json';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UserModule } from './user/user.module';
 import { Config } from './types.d';
+import { corsConfig } from './main';
+import { UserModule } from './user/user.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 
 const environment = process.env.NODE_ENV || 'development';
@@ -45,6 +46,7 @@ export const pubsub = new PubSub();
       playground: true,
       installSubscriptionHandlers: true,
       autoSchemaFile: 'schema.gql',
+      cors: { ...corsConfig },
       context: async ({
         req: request,
         res: response,
