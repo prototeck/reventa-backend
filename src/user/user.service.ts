@@ -36,6 +36,11 @@ export class UserService {
     }
   }
 
+  /**
+   * * find the user in database by unique email
+   * @param email - email id of user
+   * @returns found User type record
+   */
   async findByEmail(email: string): Promise<IUser> {
     const user = await this.UserModel.findOne({ email }).lean();
 
@@ -133,6 +138,11 @@ export class UserService {
     }
   }
 
+  /**
+   * * confirm the registered (pending verification) user by code
+   * @param input - confirm user input including the verification code
+   * @returns success message string
+   */
   async confirmUser(input: ConfirmUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
@@ -156,9 +166,11 @@ export class UserService {
   }
 
   /**
-   * delete an existing user in the database
-   * @param userId - id of the user to be deleted
-   * @returns - deleted user
+   * * login the user using cognito and return tokens
+   * @param input - user authentication details
+   * @returns authorization tokens
+   *
+   * @public
    */
 
   async loginUser(input: LoginUserInput) {
