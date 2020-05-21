@@ -53,7 +53,7 @@ describe('UserService', () => {
           useFactory: () => ({
             userSignup: jest.fn(),
             confirmCode: jest.fn(),
-
+            userSignin: jest.fn(),
           }),
         },
       ],
@@ -200,28 +200,34 @@ describe('UserService', () => {
   //   })
   // }
   describe('update user function', () => {
+    const mongoId = Types.ObjectId();
+    let mockedLean: jest.Mock<any{ }>;
+
+    const updateInput: UpdateUserInput = {
+      firstName: 'aditya',
+      lastName: 'loshali',
+    };
+
     beforeEach(() => {
       jest.restoreAllMocks();
     });
 
-    it('should call UserModel.findOne to check existing user', async done => {
-      const createInput: CreateUserInput = {
-        firstName: 'Aditya',
-        lastName: 'Loshali',
-        email: 'aditya.loshali@gmail.com',
-        password: 'Password@1',
-      };
+    beforeEach(async () => {
+      mockedLean = jest.fn(() => { })
 
-      expect(service.findByEmail).toHaveBeenCalledWith(createInput.email);
-      done();
-    });
+      const mockedWithLean = () => ({ lean: mockedLean });
+      jest.spyOn(UserModelMock, 'findOne').mockImplementationOnce(mockedWithLean);
+
+      await service.updateUser(mongoId, updateInput);
+    })
+
+    it('should call UserModel.findOne to check existing user', done => {
+      expect(UserModelMock.findOne).
+    })
 
     it('should call UserModel.findOneAndUpdate to update user', async done => {
       const id = '1';
-      const updateInput: UpdateUserInput = {
-        firstName: 'aditya',
-        lastName: 'loshali',
-      };
+
 
       jest
         .spyOn(UserModelMock, 'findOneAndUpdate')
@@ -286,15 +292,15 @@ describe('UserService', () => {
       jest.restoreAllMocks();
     });
 
-    it('should call UserModel.findOne to check existing user', async done => {
-      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+    // it('should call UserModel.findOne to check existing user', async done => {
+    //   jest.spyOn(service, 'findByEmail').mockResolvedValue(loginInput.email);
 
-      await service.createUser(createInput);
+    //   await service.loginUser(loginInput);
 
-      expect(service.findByEmail).toHaveBeenCalledWith(loginInput.email);
+    //   expect(service.findByEmail).toHaveBeenCalledWith(loginInput.email);
 
-      done();
-    });
+    //   done();
+    // });
 
     it('should call AuthenticationService userSignin method with expected values', () => {
       expect(spyAuthenticationService.userSignin).toBeCalledWith({

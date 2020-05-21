@@ -1,13 +1,15 @@
-import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
+import { ObjectType, Field } from '@nestjs/graphql';
 
-@ObjectType('LoginUser', { description: 'The LoginUser model' })
+@ObjectType('AuthInfo', {
+  description: 'The Auth Info schema for authentication tokens',
+})
 export class AuthInfoDTO {
-    @Field(() => ID)
-    readonly idToken: string;
+  @Field()
+  readonly idToken: string;
 
-    @Field()
-    readonly accessToken: string;
+  @Field()
+  readonly accessToken: string;
 
-    @Field(() => Float)
-    readonly refreshToken: string;
+  @Field()
+  readonly refreshToken: string;
 }

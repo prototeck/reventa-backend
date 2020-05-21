@@ -50,10 +50,10 @@ export class UserResolver {
     return result;
   }
 
-  @Mutation(() => AuthInfoDTO)
+  @Query(() => AuthInfoDTO)
   async signinUser(@Args('input') input: LoginUserInput) {
     const result = await this.userService.loginUser(input);
-    console.log('result login', result)
+
     return result;
   }
 }

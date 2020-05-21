@@ -6,12 +6,12 @@ import { IsEmail } from 'class-validator';
  */
 @InputType()
 export class LoginUserInput {
-    /** user's email address - a valid email address */
-    @Field()
-    @IsEmail()
-    readonly email: string;
+  /** user's email address - a valid email address */
+  @Field()
+  @IsEmail()
+  readonly email: string;
 
-    /** user's password  */
-    @Field()
-    readonly password: string;
+  /** user's password  */
+  @Field()
+  readonly password: string;
 }
