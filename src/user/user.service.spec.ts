@@ -23,17 +23,15 @@ class UserModelMock {
     return this.data;
   }
 
-  static findOne: jest.Mock<any> = jest.fn(() => []);
+  static findOne: jest.Mock<any> = jest.fn();
 
-  static find: jest.Mock<any> = jest.fn(() => []);
+  static find: jest.Mock<any> = jest.fn();
 
-  static findOneAndUpdate: jest.Mock<any> = jest.fn(() => []);
+  static findOneAndUpdate: jest.Mock<any> = jest.fn();
 
   static updateMany: jest.Mock<any> = jest.fn();
 
-  static findOneAndDelete: jest.Mock<any> = jest.fn(() => ({
-    lean: jest.fn(),
-  }));
+  static findOneAndDelete: jest.Mock<any> = jest.fn();
 }
 
 describe('UserService', () => {
