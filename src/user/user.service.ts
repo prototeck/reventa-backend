@@ -13,7 +13,7 @@ import { LoginUserInput } from './inputs/login-user.input';
 
 const USER_ERRORS = {
   USER_EXISTS: 'an user with the email already exists',
-  USER_NOT_FOUND: 'user with the provided email not found',
+  USER_NOT_FOUND: 'user does not exist',
 } as const;
 
 @Injectable()
