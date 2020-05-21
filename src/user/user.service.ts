@@ -21,7 +21,7 @@ export class UserService {
   constructor(
     @InjectModel('User') private UserModel: Model<User>,
     private readonly authenticationService: AuthenticationService,
-  ) { }
+  ) {}
 
   /**
    * * finds all the users in the database
@@ -30,10 +30,8 @@ export class UserService {
   async findAll(): Promise<IUser[]> {
     try {
       const users = await this.UserModel.find({}).lean();
-      console.log('users', users);
       return users;
     } catch (error) {
-      console.log('errorrrr', error);
       throw makeError(error);
     }
   }
@@ -72,13 +70,23 @@ export class UserService {
 
   /**
    * * update an existing User in the database
-   * @param input - existing user details
+   * @param id - user's mongo id
+   * @param updateInput - user details to update
    * @returns updated User type record
    *
    * @public
    */
   async updateUser(id: string, updateInput: UpdateUserInput) {
     try {
+      const existingUser = await this.UserModel.findOne({ _id: id });
+
+      if (!existingUser) {
+        throw new HttpException(
+          USER_ERRORS.USER_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       const updatedUser = await this.UserModel.findOneAndUpdate(
         {
           _id: id,
@@ -90,6 +98,7 @@ export class UserService {
           new: true,
         },
       );
+
       return updatedUser;
     } catch (error) {
       throw makeError(error);
@@ -97,15 +106,27 @@ export class UserService {
   }
 
   /**
-   * delete an existing user in the database
-   * @param userId - id of the user to be deleted
+   * * delete an existing user in the database
+   * @param id - mongo id of the user to be deleted
    * @returns - deleted user
+   *
+   * @public
    */
   async deleteUser(id: string): Promise<IUser> {
     try {
+      const existingUser = await this.UserModel.findOne({ _id: id });
+
+      if (!existingUser) {
+        throw new HttpException(
+          USER_ERRORS.USER_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
       const deletedUser = await this.UserModel.findOneAndDelete({
         _id: id,
       });
+
       return deletedUser;
     } catch (error) {
       throw makeError(error);

@@ -11,3 +11,9 @@ export interface IUser {
 export interface User extends IUser, Document {
   _id: string;
 }
+
+export interface AuthInfo {
+  idToken: string;
+  accessToken: string;
+  refreshToken: string;
+}

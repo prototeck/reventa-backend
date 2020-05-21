@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 import * as AWS from 'aws-sdk';
 
-import { IUser } from '../user/interfaces/user.interface';
+import { IUser, AuthInfo } from '../user/interfaces/user.interface';
 
 export type CognitoUserAttribute = AmazonCognitoIdentity.CognitoUserAttribute;
 
@@ -63,7 +63,7 @@ export class AuthenticationService {
     });
   }
 
-  private signIn(userId: string, password: string) {
+  private signIn(userId: string, password: string): Promise<AuthInfo> {
     return new Promise((resolve, reject) => {
       const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
         {
@@ -78,12 +78,16 @@ export class AuthenticationService {
       };
 
       const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
       cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess(result) {
-          console.log('access token + ', result.getAccessToken().getJwtToken());
-          console.log('id token  ', result.getIdToken().getJwtToken());
-          console.log('refresh token', result.getRefreshToken().getToken());
-          return resolve(result);
+          const tokens = {
+            idToken: result.getIdToken().getJwtToken(),
+            accessToken: result.getAccessToken().getJwtToken(),
+            refreshToken: result.getRefreshToken().getToken(),
+          };
+
+          return resolve(tokens);
         },
         onFailure(error) {
           return reject(new Error(error.message || JSON.stringify(error)));
@@ -127,7 +131,7 @@ export class AuthenticationService {
     });
   }
 
-  public userSignin(user: IUser, password: string) {
+  public userSignin(user: IUser, password: string): Promise<AuthInfo> {
     return new Promise((resolve, reject) => {
       // eslint-disable-next-line no-underscore-dangle
       this.signIn(user._id, password)

@@ -11,15 +11,21 @@ type User {
   createdOn: Float!
 }
 
-"""The User model"""
-type UserLog {
-  idToken: ID!
+"""The Auth Info schema for authentication tokens"""
+type AuthInfo {
+  idToken: String!
   accessToken: String!
-  refreshToken: Float!
+  refreshToken: String!
 }
 
 type Query {
   users: [User!]!
+  signinUser(input: LoginUserInput!): AuthInfo!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
 }
 
 type Mutation {
@@ -27,7 +33,6 @@ type Mutation {
   updateUser(input: UpdateUserInput!, id: String!): User!
   deleteUser(id: String!): User!
   confirmUser(input: ConfirmUserInput!): String!
-  signinUser(input: LoginUserInput!): UserLog!
 }
 
 input CreateUserInput {
@@ -40,15 +45,9 @@ input CreateUserInput {
 input UpdateUserInput {
   firstName: String
   lastName: String
-  email: String
 }
 
 input ConfirmUserInput {
   email: String!
   code: String!
-}
-
-input LoginUserInput {
-  email: String!
-  password: String!
 }
