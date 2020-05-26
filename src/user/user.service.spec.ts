@@ -188,85 +188,6 @@ describe('UserService', () => {
       });
     });
   });
-  // describe('get all users function', () => {
-  //   beforeEach(() => {
-  //     jest.restoreAllMocks();
-  //   });
-
-  //   it('should call UserModel.findall to get all users', async done =>{
-  //     const userArray =
-  //   })
-  // }
-  // describe('update user function', () => {
-  //   beforeEach(() => {
-  //     jest.restoreAllMocks();
-  //   });
-
-  //   it('should call UserModel.findOne to check existing user', async done => {
-  //     const createInput: CreateUserInput = {
-  //       firstName: 'Aditya',
-  //       lastName: 'Loshali',
-  //       email: 'aditya.loshali@gmail.com',
-  //       password: 'Password@1',
-  //     };
-
-  //     expect(service.findByEmail).toHaveBeenCalledWith(createInput.email);
-  //     done();
-  //   });
-
-  //   it('should call UserModel.findOneAndUpdate to update user', async done => {
-  //     const id = '1';
-  //     const updateInput: UpdateUserInput = {
-  //       firstName: 'aditya',
-  //       lastName: 'loshali',
-  //     };
-
-  //     jest
-  //       .spyOn(UserModelMock, 'findOneAndUpdate')
-  //       .mockResolvedValue(updateInput);
-
-  //     await service.updateUser(id, updateInput);
-
-  //     expect(UserModelMock.findOneAndUpdate).toHaveBeenCalledWith(
-  //       { _id: id },
-  //       { $set: { ...updateInput } },
-  //       { new: true },
-  //     );
-  //     done();
-  //   });
-  // });
-
-  // describe('delete user function', () => {
-  //   beforeEach(() => {
-  //     jest.restoreAllMocks();
-  //   });
-
-  //   it('should call UserModel.findOne to check existing user', async done => {
-  //     const createInput: CreateUserInput = {
-  //       firstName: 'Aditya',
-  //       lastName: 'Loshali',
-  //       email: 'aditya.loshali@gmail.com',
-  //       password: 'Password@1',
-  //     };
-  //     jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
-
-  //     expect(service.findByEmail).toHaveBeenCalledWith(createInput.email);
-
-  //     done();
-  //   });
-  //   it('should call UserModel.findOneAndDelete to delete user', async done => {
-  //     const id = '1';
-
-  //     jest.spyOn(UserModelMock, 'findOneAndDelete').mockResolvedValue(id);
-
-  //     await service.deleteUser(id);
-
-  //     expect(UserModelMock.findOneAndDelete).toHaveBeenCalledWith({
-  //       _id: id,
-  //     });
-  //     done();
-  //   });
-  // });
 
   describe('Sign in user function', () => {
     // input test data
@@ -349,6 +270,114 @@ describe('UserService', () => {
       /** third business rule - after cognito login successfully resolves. login service return tokens */
       it('should return authentication tokens', () => {
         expect(result).toMatchObject(tokens);
+      });
+    });
+  });
+
+  describe('Update user function', () => {
+    const mongoId = Types.ObjectId().toHexString();
+    let mockedLean: jest.Mock<any>;
+
+    const updateInput: UpdateUserInput = {
+      firstName: 'aditya',
+      lastName: 'loshali',
+    };
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should throw error when user not found', done => {
+      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+      service
+        .updateUser(mongoId, updateInput)
+        .then(() => done.fail('did not throw any error'))
+        .catch(error => {
+          expect(error).toBeInstanceOf(HttpException);
+          expect(error.status).toBe(HttpStatus.NOT_FOUND);
+          expect(error.message).toContain('not exist');
+
+          done();
+        });
+    });
+
+    describe('when input data is correct', () => {
+      let result;
+
+      beforeEach(async () => {
+        mockedLean = jest.fn(() => {});
+
+        const mockedWithLean = () => ({ lean: mockedLean });
+
+        jest.spyOn(UserModelMock, 'findOne').mockImplementation(mockedWithLean);
+
+        jest
+          .spyOn(UserModelMock, 'findOneAndUpdate')
+          .mockResolvedValue(updateInput);
+
+        result = await service.updateUser(mongoId, updateInput);
+      });
+
+      it('should call UserMocdelMock.findOne to check existing user', () => {
+        expect(UserModelMock.findOne).toBeCalledWith({ _id: mongoId });
+      });
+
+      it('should call UserMocdelMock.findOneAndUpdate to check user updation', () => {
+        expect(UserModelMock.findOneAndUpdate).toBeCalledWith(
+          { _id: mongoId },
+          { $set: { ...updateInput } },
+          { new: true },
+        );
+      });
+    });
+  });
+
+  describe('Delete user function', () => {
+    const mongoId = Types.ObjectId().toHexString();
+    let mockedLean: jest.Mock<any>;
+
+    beforeEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('should throw error when user not found', done => {
+      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+
+      service
+        .deleteUser(mongoId)
+        .then(() => done.fail('did not throw any error'))
+        .catch(error => {
+          expect(error).toBeInstanceOf(HttpException);
+          expect(error.status).toBe(HttpStatus.NOT_FOUND);
+          expect(error.message).toContain('not exist');
+
+          done();
+        });
+    });
+
+    describe('when input data is correct', () => {
+      let result;
+
+      beforeEach(async () => {
+        mockedLean = jest.fn(() => {});
+
+        const mockedWithLean = () => ({ lean: mockedLean });
+
+        jest.spyOn(UserModelMock, 'findOne').mockImplementation(mockedWithLean);
+
+        jest
+          .spyOn(UserModelMock, 'findOneAndDelete')
+          .mockResolvedValue(mongoId);
+
+        result = await service.deleteUser(mongoId);
+      });
+
+      it('should call UserModelMock.findOne to check existing user', () => {
+        expect(UserModelMock.findOne).toBeCalledWith({ _id: mongoId });
+      });
+
+      it('should call UserMocdelMock.findOneAndUpdate to check user deletion', () => {
+        expect(UserModelMock.findOneAndDelete).toBeCalledWith({ _id: mongoId });
       });
     });
   });
