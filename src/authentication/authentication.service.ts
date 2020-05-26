@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 import * as AWS from 'aws-sdk';
 
-import { IUser } from '../user/interfaces/user.interface';
+import { IUser, AuthInfo } from '../user/interfaces/user.interface';
 
 export type CognitoUserAttribute = AmazonCognitoIdentity.CognitoUserAttribute;
 
@@ -63,6 +63,39 @@ export class AuthenticationService {
     });
   }
 
+  private signIn(userId: string, password: string): Promise<AuthInfo> {
+    return new Promise((resolve, reject) => {
+      const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
+        {
+          Username: userId,
+          Password: password,
+        },
+      );
+
+      const userData = {
+        Username: userId,
+        Pool: this.userPool,
+      };
+
+      const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+      cognitoUser.authenticateUser(authenticationDetails, {
+        onSuccess(result) {
+          const tokens = {
+            idToken: result.getIdToken().getJwtToken(),
+            accessToken: result.getAccessToken().getJwtToken(),
+            refreshToken: result.getRefreshToken().getToken(),
+          };
+
+          return resolve(tokens);
+        },
+        onFailure(error) {
+          return reject(new Error(error.message || JSON.stringify(error)));
+        },
+      });
+    });
+  }
+
   private confirmRegistration(userId: string, code: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const userData = {
@@ -93,6 +126,15 @@ export class AuthenticationService {
 
       // eslint-disable-next-line no-underscore-dangle
       this.signUp(user._id, password, attributeList)
+        .then(resolve)
+        .catch(reject);
+    });
+  }
+
+  public userSignin(user: IUser, password: string): Promise<AuthInfo> {
+    return new Promise((resolve, reject) => {
+      // eslint-disable-next-line no-underscore-dangle
+      this.signIn(user._id, password)
         .then(resolve)
         .catch(reject);
     });

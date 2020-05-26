@@ -11,12 +11,27 @@ type User {
   createdOn: Float!
 }
 
+"""The Auth Info schema for authentication tokens"""
+type AuthInfo {
+  idToken: String!
+  accessToken: String!
+  refreshToken: String!
+}
+
 type Query {
   users: [User!]!
+  signinUser(input: LoginUserInput!): AuthInfo!
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
 }
 
 type Mutation {
   createUser(input: CreateUserInput!): User!
+  updateUser(input: UpdateUserInput!, id: String!): User!
+  deleteUser(id: String!): User!
   confirmUser(input: ConfirmUserInput!): String!
 }
 
@@ -25,6 +40,11 @@ input CreateUserInput {
   lastName: String!
   email: String!
   password: String!
+}
+
+input UpdateUserInput {
+  firstName: String
+  lastName: String
 }
 
 input ConfirmUserInput {
