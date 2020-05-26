@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
@@ -189,7 +190,7 @@ describe('UserService', () => {
     });
   });
 
-  describe('Sign in user function', () => {
+  describe('sign in user function', () => {
     // input test data
     const loginInput: LoginUserInput = {
       email: 'aditya.loshali@gmail.com',
@@ -274,7 +275,7 @@ describe('UserService', () => {
     });
   });
 
-  describe('Update user function', () => {
+  describe('update user function', () => {
     const mongoId = Types.ObjectId().toHexString();
     let mockedLean: jest.Mock<any>;
 
@@ -288,7 +289,12 @@ describe('UserService', () => {
     });
 
     it('should throw error when user not found', done => {
-      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+      mockedLean = jest.fn(() => undefined);
+
+      const mockedWithLean = () => ({ lean: mockedLean });
+
+      jest.spyOn(UserModelMock, 'findOne').mockImplementation(mockedWithLean);
+
       service
         .updateUser(mongoId, updateInput)
         .then(() => done.fail('did not throw any error'))
@@ -302,37 +308,43 @@ describe('UserService', () => {
     });
 
     describe('when input data is correct', () => {
-      let result;
+      let result: IUser;
 
       beforeEach(async () => {
-        mockedLean = jest.fn(() => {});
+        mockedLean = jest.fn(() => ({}));
 
         const mockedWithLean = () => ({ lean: mockedLean });
 
         jest.spyOn(UserModelMock, 'findOne').mockImplementation(mockedWithLean);
 
-        jest
-          .spyOn(UserModelMock, 'findOneAndUpdate')
-          .mockResolvedValue(updateInput);
+        jest.spyOn(UserModelMock, 'findOneAndUpdate').mockResolvedValue({
+          ...updateInput,
+          _id: mongoId,
+        });
 
         result = await service.updateUser(mongoId, updateInput);
       });
 
-      it('should call UserMocdelMock.findOne to check existing user', () => {
+      it('should call UserModelMock.findOne to check existing user', () => {
         expect(UserModelMock.findOne).toBeCalledWith({ _id: mongoId });
       });
 
-      it('should call UserMocdelMock.findOneAndUpdate to check user updation', () => {
+      it('should call UserModelMock.findOneAndUpdate to update user', () => {
         expect(UserModelMock.findOneAndUpdate).toBeCalledWith(
           { _id: mongoId },
           { $set: { ...updateInput } },
           { new: true },
         );
       });
+
+      it('should return the updated record as result', () => {
+        expect(result).toMatchObject(updateInput);
+        expect(result._id).toBeDefined();
+      });
     });
   });
 
-  describe('Delete user function', () => {
+  describe('delete user function', () => {
     const mongoId = Types.ObjectId().toHexString();
     let mockedLean: jest.Mock<any>;
 
@@ -341,7 +353,11 @@ describe('UserService', () => {
     });
 
     it('should throw error when user not found', done => {
-      jest.spyOn(UserModelMock, 'findOne').mockResolvedValue(undefined);
+      mockedLean = jest.fn(() => undefined);
+
+      const mockedWithLean = () => ({ lean: mockedLean });
+
+      jest.spyOn(UserModelMock, 'findOne').mockImplementation(mockedWithLean);
 
       service
         .deleteUser(mongoId)
@@ -356,10 +372,10 @@ describe('UserService', () => {
     });
 
     describe('when input data is correct', () => {
-      let result;
+      let result: IUser;
 
       beforeEach(async () => {
-        mockedLean = jest.fn(() => {});
+        mockedLean = jest.fn(() => ({}));
 
         const mockedWithLean = () => ({ lean: mockedLean });
 
@@ -367,7 +383,7 @@ describe('UserService', () => {
 
         jest
           .spyOn(UserModelMock, 'findOneAndDelete')
-          .mockResolvedValue(mongoId);
+          .mockResolvedValue({ _id: mongoId });
 
         result = await service.deleteUser(mongoId);
       });
@@ -376,8 +392,12 @@ describe('UserService', () => {
         expect(UserModelMock.findOne).toBeCalledWith({ _id: mongoId });
       });
 
-      it('should call UserMocdelMock.findOneAndUpdate to check user deletion', () => {
+      it('should call UserMocdelMock.findOneAndDelete to check user deletion', () => {
         expect(UserModelMock.findOneAndDelete).toBeCalledWith({ _id: mongoId });
+      });
+
+      it('should return the result of findOneAndDelete', () => {
+        expect(result._id).toBeDefined();
       });
     });
   });

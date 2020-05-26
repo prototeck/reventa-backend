@@ -81,9 +81,9 @@ export class UserService {
    *
    * @public
    */
-  async updateUser(id: string, updateInput: UpdateUserInput) {
+  async updateUser(id: string, updateInput: UpdateUserInput): Promise<IUser> {
     try {
-      const existingUser = await this.UserModel.findOne({ _id: id });
+      const existingUser = await this.UserModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
         throw new HttpException(
@@ -119,7 +119,7 @@ export class UserService {
    */
   async deleteUser(id: string): Promise<IUser> {
     try {
-      const existingUser = await this.UserModel.findOne({ _id: id });
+      const existingUser = await this.UserModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
         throw new HttpException(
