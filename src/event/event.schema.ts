@@ -1,5 +1,21 @@
 import * as mongoose from 'mongoose';
 
+const LocationSchema = new mongoose.Schema(
+  {
+    latitude: {
+      type: String,
+      required: true,
+    },
+    longitude: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    _id: false,
+  },
+);
+
 export const EventSchema = new mongoose.Schema(
   {
     title: {
@@ -10,7 +26,7 @@ export const EventSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    startOn: {
+    startsOn: {
       type: Number,
       required: true,
     },
@@ -19,8 +35,8 @@ export const EventSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-      latitude: Number,
-      longitude: Number,
+      type: LocationSchema,
+      required: true,
     },
     category: {
       type: String,

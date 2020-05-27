@@ -18,9 +18,9 @@ type AuthInfo {
   refreshToken: String!
 }
 
-type location {
-  latitude: Float!
-  longitude: Float!
+type Location {
+  latitude: String!
+  longitude: String!
 }
 
 """The Event Model"""
@@ -28,9 +28,9 @@ type Event {
   _id: ID!
   title: String!
   description: String!
-  startOn: Float!
+  startsOn: Float!
   endsOn: Float!
-  location: location!
+  location: Location!
   category: String!
   tags: [String!]!
   createdOn: Float!
@@ -77,7 +77,7 @@ input ConfirmUserInput {
 input CreateEventInput {
   title: String!
   description: String!
-  startOn: Float!
+  startsOn: Float!
   endsOn: Float!
   location: LocationInput!
   category: String!
@@ -85,14 +85,14 @@ input CreateEventInput {
 }
 
 input LocationInput {
-  latitude: Float
-  longitude: Float
+  latitude: String!
+  longitude: String!
 }
 
 input UpdateEventInput {
   title: String
   description: String
-  startOn: Float
+  startsOn: Float
   endsOn: Float
   location: LocationInput
   category: String

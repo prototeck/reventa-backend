@@ -16,7 +16,7 @@ export class EventDTO {
   readonly description: string;
 
   @Field(() => Float)
-  readonly startOn: number;
+  readonly startsOn: number;
 
   @Field(() => Float)
   readonly endsOn: number;
@@ -28,7 +28,7 @@ export class EventDTO {
   readonly category: string;
 
   @Field(() => [String])
-  readonly tags: [string];
+  readonly tags: string[];
 
   @Field(() => Float)
   readonly createdOn: number;

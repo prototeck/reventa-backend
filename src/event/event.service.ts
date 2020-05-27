@@ -22,6 +22,7 @@ export class EventService {
   async findAll(): Promise<IEvent[]> {
     try {
       const events = await this.EventModel.find({}).lean();
+
       return events;
     } catch (error) {
       throw makeError(error);
@@ -39,7 +40,6 @@ export class EventService {
     try {
       const event = await new this.EventModel({
         ...input,
-        createdOn: Date.now(),
       }).save();
 
       return event;

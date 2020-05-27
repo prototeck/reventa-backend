@@ -1,8 +1,8 @@
 import { Document } from 'mongoose';
 
 export interface Location {
-  latitude: number;
-  longitude: number;
+  latitude: string;
+  longitude: string;
 }
 
 export interface IEvent {
@@ -13,7 +13,7 @@ export interface IEvent {
   endsOn: number;
   location: Location;
   category: string;
-  tags: Array<string>;
+  tags: string[];
   createdOn: number;
   updatedOn: number;
 }
