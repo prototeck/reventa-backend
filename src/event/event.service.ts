@@ -9,7 +9,6 @@ import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 
 const USER_ERRORS = {
-  EVENT_EXISTS: 'an event with the id already exists',
   EVENT_NOT_FOUND: 'event does not exist',
 } as const;
 
@@ -23,7 +22,6 @@ export class EventService {
   async findAll(): Promise<IEvent[]> {
     try {
       const events = await this.EventModel.find({}).lean();
-      console.log(events);
       return events;
     } catch (error) {
       throw makeError(error);
@@ -37,10 +35,12 @@ export class EventService {
    *
    * @public
    */
-  async createEvent(input: CreateEventInput): Promise<IEvent> {
+  async createEvent(input: CreateEventInput) {
     try {
-      const event = await new this.EventModel({ ...input }).save();
-      console.log('event created', event);
+      const event = await new this.EventModel({
+        ...input,
+        createdOn: Date.now(),
+      }).save();
 
       return event;
     } catch (error) {
@@ -56,9 +56,12 @@ export class EventService {
    *
    * @public
    */
-  async updateEvent(id: string, updateInput: UpdateEventInput): Promise<IEvent> {
+  async updateEvent(
+    id: string,
+    updateInput: UpdateEventInput,
+  ): Promise<IEvent> {
     try {
-      const existingEvent = await this.EventModel.findOne({ _id: id });
+      const existingEvent = await this.EventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {
         throw new HttpException(
@@ -72,7 +75,7 @@ export class EventService {
           _id: id,
         },
         {
-          $set: { ...updateInput },
+          $set: { ...updateInput, updatedOn: Date.now() },
         },
         {
           new: true,
@@ -94,7 +97,7 @@ export class EventService {
    */
   async deleteEvent(id: string): Promise<IEvent> {
     try {
-      const existingEvent = await this.EventModel.findOne({ _id: id });
+      const existingEvent = await this.EventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {
         throw new HttpException(

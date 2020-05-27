@@ -6,13 +6,13 @@ import { IsInt } from 'class-validator';
  */
 @InputType()
 export class LocationInput {
-    /** location's latitude of type number */
-    @Field()
-    @IsInt()
-    readonly latitude: number;
+  /** location's latitude of type number */
+  @Field({ nullable: true })
+  @IsInt()
+  readonly latitude: number;
 
-    /** location's longitude of type number */
-    @Field()
-    @IsInt()
-    readonly longitude: number;
+  /** location's longitude of type number */
+  @Field({ nullable: true })
+  @IsInt()
+  readonly longitude: number;
 }

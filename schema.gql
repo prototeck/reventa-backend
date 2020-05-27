@@ -19,7 +19,6 @@ type AuthInfo {
 }
 
 type location {
-  _id: ID!
   latitude: Float!
   longitude: Float!
 }
@@ -86,8 +85,8 @@ input CreateEventInput {
 }
 
 input LocationInput {
-  latitude: Float!
-  longitude: Float!
+  latitude: Float
+  longitude: Float
 }
 
 input UpdateEventInput {
