@@ -55,6 +55,7 @@ type Mutation {
   confirmUser(input: ConfirmUserInput!): String!
   createEvent(input: CreateEventInput!): Event!
   updateEvent(input: UpdateEventInput!, id: String!): Event!
+  deleteEvent(id: String!): Event!
 }
 
 input CreateUserInput {

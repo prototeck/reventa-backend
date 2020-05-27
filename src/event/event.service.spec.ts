@@ -86,11 +86,11 @@ describe('Event Service', () => {
       description: 'This is a dance show',
       tags: ['abc'],
       category: 'dance',
-      startOn: 3975375,
+      startsOn: 3975375,
       endsOn: 38758375,
       location: {
-        latitude: 764726472462,
-        longitude: 36486348364,
+        latitude: '764726472462',
+        longitude: '36486348364',
       },
     };
 
@@ -130,11 +130,11 @@ describe('Event Service', () => {
       description: 'This is a dance show',
       tags: ['abc'],
       category: 'dance',
-      startOn: 3975375,
+      startsOn: 3975375,
       endsOn: 38758375,
       location: {
-        latitude: 764726472462,
-        longitude: 36486348364,
+        latitude: '764726472462',
+        longitude: '36486348364',
       },
     };
 

@@ -32,4 +32,11 @@ export class EventResolver {
 
     return updatedEvent;
   }
+
+  @Mutation(() => EventDTO)
+  async deleteEvent(@Args('id') id: string) {
+    const deletedEvent = await this.eventService.deleteEvent(id);
+
+    return deletedEvent;
+  }
 }
