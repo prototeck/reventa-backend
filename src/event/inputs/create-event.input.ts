@@ -2,8 +2,6 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-import { Location } from '../interfaces/event.interface';
-
 import { LocationInput } from './location.input';
 /**
  * defines the input schema for event creation
@@ -31,7 +29,7 @@ export class CreateEventInput {
   // these decorators are required for nested validation
   @Type(() => LocationInput)
   @ValidateNested()
-  readonly location: Location;
+  readonly location: LocationInput;
 
   /** event's category - an all alphabet string */
   @Field()

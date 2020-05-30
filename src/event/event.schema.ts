@@ -2,12 +2,14 @@ import * as mongoose from 'mongoose';
 
 const LocationSchema = new mongoose.Schema(
   {
-    latitude: {
+    // 'location type' schema
+    type: {
       type: String,
+      enum: ['Point'],
       required: true,
     },
-    longitude: {
-      type: String,
+    coordinates: {
+      type: [Number],
       required: true,
     },
   },
@@ -59,3 +61,5 @@ export const EventSchema = new mongoose.Schema(
     collection: 'events',
   },
 );
+
+EventSchema.index({ location: '2dsphere' });

@@ -42,7 +42,7 @@ export const pubsub = new PubSub();
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
-      useFindAndModify: true,
+      // useFindAndModify: true,
     }),
     GraphQLModule.forRoot({
       playground: true,

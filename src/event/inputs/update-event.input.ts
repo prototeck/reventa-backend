@@ -2,8 +2,6 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-import { Location } from '../interfaces/event.interface';
-
 import { LocationInput } from './location.input';
 
 /**
@@ -32,7 +30,7 @@ export class UpdateEventInput {
   @Type(() => LocationInput)
   @ValidateNested()
   @IsOptional()
-  readonly location?: Location;
+  readonly location?: LocationInput;
 
   /** event's category - an all alphabet string */
   @Field({ nullable: true })

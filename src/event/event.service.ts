@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { makeError } from '../utils';
+import { Mutable } from '../types';
 
 import { Event, IEvent } from './interfaces/event.interface';
 import { CreateEventInput } from './inputs/create-event.input';
@@ -21,6 +22,17 @@ export class EventService {
    */
   async findAll(): Promise<IEvent[]> {
     try {
+      // {
+      //   location: {
+      //     $near: {
+      //       $maxDistance: 100,
+      //       $geometry: {
+      //         type: 'Point',
+      //         coordinates: [-74.005974, 40.712776],
+      //       },
+      //     },
+      //   },
+      // }
       const events = await this.EventModel.find({}).lean();
 
       return events;
@@ -40,6 +52,10 @@ export class EventService {
     try {
       const event = await new this.EventModel({
         ...input,
+        location: {
+          type: 'Point',
+          coordinates: [input.location.longitude, input.location.latitude],
+        },
       }).save();
 
       return event;
@@ -70,12 +86,25 @@ export class EventService {
         );
       }
 
+      const { location, ...updateWithoutLocation } = updateInput;
+
+      const updateDocument: Partial<Mutable<IEvent>> = {
+        ...updateWithoutLocation,
+      };
+
+      if (location) {
+        updateDocument.location = {
+          type: 'Point',
+          coordinates: [location.longitude, location.latitude],
+        };
+      }
+
       const updatedEvent = await this.EventModel.findOneAndUpdate(
         {
           _id: id,
         },
         {
-          $set: { ...updateInput, updatedOn: Date.now() },
+          $set: { ...updateDocument, updatedOn: Date.now() },
         },
         {
           new: true,

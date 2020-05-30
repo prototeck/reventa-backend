@@ -1,10 +1,10 @@
-import { ObjectType, Field } from '@nestjs/graphql';
+import { ObjectType, Field, Float } from '@nestjs/graphql';
 
 @ObjectType('Location')
 export class LocationDTO {
   @Field()
-  readonly latitude: string;
+  readonly type: string;
 
-  @Field()
-  readonly longitude: string;
+  @Field(() => [Float])
+  readonly coordinates: number[];
 }

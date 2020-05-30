@@ -1,8 +1,11 @@
 import { Document } from 'mongoose';
 
+type Longitude = number;
+type Latitude = number;
+
 export interface Location {
-  latitude: string;
-  longitude: string;
+  type: string;
+  coordinates: [Longitude, Latitude];
 }
 
 export interface IEvent {

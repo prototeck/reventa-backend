@@ -1,4 +1,4 @@
-import { InputType, Field } from '@nestjs/graphql';
+import { InputType, Field, Float } from '@nestjs/graphql';
 import { IsLatitude, IsLongitude } from 'class-validator';
 
 /**
@@ -7,12 +7,12 @@ import { IsLatitude, IsLongitude } from 'class-validator';
 @InputType()
 export class LocationInput {
   /** location's latitude of type number */
-  @Field()
+  @Field(() => Float)
   @IsLatitude()
-  readonly latitude: string;
+  readonly latitude: number;
 
   /** location's longitude of type number */
-  @Field()
+  @Field(() => Float)
   @IsLongitude()
-  readonly longitude: string;
+  readonly longitude: number;
 }
