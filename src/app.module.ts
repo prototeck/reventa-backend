@@ -11,6 +11,7 @@ import { AppService } from './app.service';
 import { Config } from './types.d';
 import { corsConfig } from './main';
 import { UserModule } from './user/user.module';
+import { EventModule } from './event/event.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 
 const environment = process.env.NODE_ENV || 'development';
@@ -66,8 +67,9 @@ export const pubsub = new PubSub();
     }),
     UserModule,
     AuthenticationModule,
+    EventModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

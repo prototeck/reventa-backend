@@ -18,9 +18,29 @@ type AuthInfo {
   refreshToken: String!
 }
 
+type Location {
+  latitude: String!
+  longitude: String!
+}
+
+"""The Event Model"""
+type Event {
+  _id: ID!
+  title: String!
+  description: String!
+  startsOn: Float!
+  endsOn: Float!
+  location: Location!
+  category: String!
+  tags: [String!]!
+  createdOn: Float!
+  updatedOn: Float!
+}
+
 type Query {
   users: [User!]!
   signinUser(input: LoginUserInput!): AuthInfo!
+  events: [Event!]!
 }
 
 input LoginUserInput {
@@ -33,6 +53,9 @@ type Mutation {
   updateUser(input: UpdateUserInput!, id: String!): User!
   deleteUser(id: String!): User!
   confirmUser(input: ConfirmUserInput!): String!
+  createEvent(input: CreateEventInput!): Event!
+  updateEvent(input: UpdateEventInput!, id: String!): Event!
+  deleteEvent(id: String!): Event!
 }
 
 input CreateUserInput {
@@ -50,4 +73,29 @@ input UpdateUserInput {
 input ConfirmUserInput {
   email: String!
   code: String!
+}
+
+input CreateEventInput {
+  title: String!
+  description: String!
+  startsOn: Float!
+  endsOn: Float!
+  location: LocationInput!
+  category: String!
+  tags: [String!]!
+}
+
+input LocationInput {
+  latitude: String!
+  longitude: String!
+}
+
+input UpdateEventInput {
+  title: String
+  description: String
+  startsOn: Float
+  endsOn: Float
+  location: LocationInput
+  category: String
+  tags: [String!]
 }
