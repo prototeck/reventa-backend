@@ -20,13 +20,15 @@ export interface Address {
 export interface IEvent {
   readonly _id: string;
   readonly title: string;
-  readonly description: string;
+  readonly description?: string;
   readonly startOn: number;
   readonly endsOn: number;
   readonly location: Location;
-  readonly address: Address;
+  readonly address?: Address;
   readonly category: string;
-  readonly tags: string[];
+  readonly tags?: string[];
+  readonly mainImageUrl?: string;
+  readonly secondaryImageUrls?: string[];
   readonly createdOn: number;
   readonly updatedOn: number;
 }

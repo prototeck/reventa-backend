@@ -36,6 +36,12 @@ export class UpdateEventInput {
   @Field({ nullable: true })
   readonly category?: string;
 
+  @Field({ nullable: true })
+  readonly mainImageUrl?: string;
+
+  @Field(() => [String], { nullable: true })
+  readonly secondaryImageUrls?: string[];
+
   /** event's tags - an all alphabet string */
   @Field(() => [String], { nullable: true })
   readonly tags?: string[];

@@ -81,6 +81,13 @@ export const EventSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    mainImageUrl: {
+      type: String,
+    },
+    secondaryImageUrls: {
+      type: [String],
+      default: [],
+    },
     createdOn: {
       type: Number,
       default: Date.now,

@@ -43,6 +43,8 @@ type Event {
   address: AddressDTO
   category: String!
   tags: [String!]
+  mainImageUrl: String
+  secondaryImageUrls: [String!]
   createdOn: Float!
   updatedOn: Float!
 }
@@ -117,5 +119,7 @@ input UpdateEventInput {
   endsOn: Float
   location: LocationInput
   category: String
+  mainImageUrl: String
+  secondaryImageUrls: [String!]
   tags: [String!]
 }

@@ -34,6 +34,12 @@ export class EventDTO {
   @Field(() => [String], { nullable: true })
   readonly tags?: string[];
 
+  @Field({ nullable: true })
+  readonly mainImageUrl?: string;
+
+  @Field(() => [String], { nullable: true })
+  readonly secondaryImageUrls?: string[];
+
   @Field(() => Float)
   readonly createdOn: number;
 
