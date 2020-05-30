@@ -10,10 +10,14 @@ import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 import { IEvent } from './interfaces/event.interface';
 
+const mockConstructor = jest.fn();
+
 class EventModelMock {
   data: any;
 
   constructor(data) {
+    mockConstructor({ ...data });
+
     this.data = { ...data };
   }
 
@@ -34,6 +38,7 @@ class EventModelMock {
 
 describe('Event Service', () => {
   let service: EventService;
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -86,11 +91,11 @@ describe('Event Service', () => {
       description: 'This is a dance show',
       tags: ['abc'],
       category: 'dance',
-      startsOn: 3975375,
-      endsOn: 38758375,
+      startsOn: Date.now(),
+      endsOn: Date.now(),
       location: {
-        latitude: '764726472462',
-        longitude: '36486348364',
+        latitude: 40.712776,
+        longitude: -74.005974,
       },
     };
 
@@ -113,6 +118,16 @@ describe('Event Service', () => {
       });
 
       it('should call the EventModel save method and return correct result', () => {
+        expect(mockConstructor).toHaveBeenCalledWith({
+          ...createInput,
+          location: {
+            type: 'Point',
+            coordinates: [
+              createInput.location.longitude,
+              createInput.location.latitude,
+            ],
+          },
+        });
         expect(EventModelMock.prototype.save).toHaveBeenCalled();
         expect(result).toMatchObject(createInput);
         // eslint-disable-next-line no-underscore-dangle
@@ -130,11 +145,11 @@ describe('Event Service', () => {
       description: 'This is a dance show',
       tags: ['abc'],
       category: 'dance',
-      startsOn: 3975375,
-      endsOn: 38758375,
+      startsOn: Date.now(),
+      endsOn: Date.now(),
       location: {
-        latitude: '764726472462',
-        longitude: '36486348364',
+        latitude: 40.712776,
+        longitude: -74.005974,
       },
     };
 
@@ -187,11 +202,25 @@ describe('Event Service', () => {
       });
 
       it('should call EventModelMock.findOneAndUpdate to update event', () => {
-        expect(EventModelMock.findOneAndUpdate).toBeCalledWith(
-          { _id: mongoId },
-          { $set: { ...updateInput, updatedOn: Date.now() } },
-          { new: true },
-        );
+        expect(EventModelMock.findOneAndUpdate.mock.calls[1][0]).toEqual({
+          _id: mongoId,
+        });
+        expect(EventModelMock.findOneAndUpdate.mock.calls[1][1]).toMatchObject({
+          $set: {
+            ...updateInput,
+            // updatedOn: Date.now(),
+            location: {
+              type: 'Point',
+              coordinates: [
+                updateInput.location.longitude,
+                updateInput.location.latitude,
+              ],
+            },
+          },
+        });
+        expect(EventModelMock.findOneAndUpdate.mock.calls[1][2]).toEqual({
+          new: true,
+        });
       });
 
       it('should return the updated record as result', () => {
