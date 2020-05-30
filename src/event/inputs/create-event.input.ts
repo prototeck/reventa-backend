@@ -2,7 +2,11 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
+import { Address } from '../interfaces/event.interface';
+
 import { LocationInput } from './location.input';
+import { AddressInput } from './address.input';
+
 /**
  * defines the input schema for event creation
  */
@@ -13,8 +17,8 @@ export class CreateEventInput {
   readonly title: string;
 
   /** event's description - an all alphabet string */
-  @Field()
-  readonly description: string;
+  @Field({ nullable: true })
+  readonly description?: string;
 
   /** event's starting date */
   @Field(() => Float)
@@ -31,11 +35,16 @@ export class CreateEventInput {
   @ValidateNested()
   readonly location: LocationInput;
 
+  @Field(() => AddressInput, { nullable: true })
+  @Type(() => AddressInput)
+  @ValidateNested()
+  readonly address?: Address;
+
   /** event's category - an all alphabet string */
   @Field()
   readonly category: string;
 
   /** event's tags - an array of all alphabet string */
-  @Field(() => [String])
-  readonly tags: string[];
+  @Field(() => [String], { nullable: true })
+  readonly tags?: string[];
 }

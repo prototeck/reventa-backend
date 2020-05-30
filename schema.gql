@@ -23,16 +23,26 @@ type Location {
   coordinates: [Float!]!
 }
 
+type AddressDTO {
+  addressLine1: String!
+  addressLine2: String
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String!
+}
+
 """The Event Model"""
 type Event {
   _id: ID!
   title: String!
-  description: String!
+  description: String
   startsOn: Float!
   endsOn: Float!
   location: Location!
+  address: AddressDTO
   category: String!
-  tags: [String!]!
+  tags: [String!]
   createdOn: Float!
   updatedOn: Float!
 }
@@ -77,17 +87,27 @@ input ConfirmUserInput {
 
 input CreateEventInput {
   title: String!
-  description: String!
+  description: String
   startsOn: Float!
   endsOn: Float!
   location: LocationInput!
+  address: AddressInput
   category: String!
-  tags: [String!]!
+  tags: [String!]
 }
 
 input LocationInput {
   latitude: Float!
   longitude: Float!
+}
+
+input AddressInput {
+  addressLine1: String!
+  addressLine2: String
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String!
 }
 
 input UpdateEventInput {
