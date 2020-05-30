@@ -8,7 +8,7 @@ import { Event, IEvent } from './interfaces/event.interface';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 
-const USER_ERRORS = {
+const EVENT_ERRORS = {
   EVENT_NOT_FOUND: 'event does not exist',
 } as const;
 
@@ -65,7 +65,7 @@ export class EventService {
 
       if (!existingEvent) {
         throw new HttpException(
-          USER_ERRORS.EVENT_NOT_FOUND,
+          EVENT_ERRORS.EVENT_NOT_FOUND,
           HttpStatus.NOT_FOUND,
         );
       }
@@ -101,7 +101,7 @@ export class EventService {
 
       if (!existingEvent) {
         throw new HttpException(
-          USER_ERRORS.EVENT_NOT_FOUND,
+          EVENT_ERRORS.EVENT_NOT_FOUND,
           HttpStatus.NOT_FOUND,
         );
       }

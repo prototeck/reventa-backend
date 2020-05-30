@@ -9,7 +9,7 @@ import configs from './config/config.json';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Config } from './types.d';
-import { corsConfig } from './main';
+import { corsConfig } from './utils';
 import { UserModule } from './user/user.module';
 import { EventModule } from './event/event.module';
 import { AuthenticationModule } from './authentication/authentication.module';
@@ -42,6 +42,7 @@ export const pubsub = new PubSub();
       useNewUrlParser: true,
       useUnifiedTopology: true,
       useCreateIndex: true,
+      useFindAndModify: true,
     }),
     GraphQLModule.forRoot({
       playground: true,
@@ -72,4 +73,4 @@ export const pubsub = new PubSub();
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}

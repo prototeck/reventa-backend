@@ -1,10 +1,10 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
-import { IsAlpha } from 'class-validator';
+import { ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 import { Location } from '../interfaces/event.interface';
 
 import { LocationInput } from './location.input';
-
 /**
  * defines the input schema for event creation
  */
@@ -12,12 +12,10 @@ import { LocationInput } from './location.input';
 export class CreateEventInput {
   /** event's title - an all alphabet string */
   @Field()
-  @IsAlpha()
   readonly title: string;
 
   /** event's description - an all alphabet string */
   @Field()
-  @IsAlpha()
   readonly description: string;
 
   /** event's starting date */
@@ -30,14 +28,16 @@ export class CreateEventInput {
 
   /** event's location  */
   @Field(() => LocationInput)
+  // these decorators are required for nested validation
+  @Type(() => LocationInput)
+  @ValidateNested()
   readonly location: Location;
 
   /** event's category - an all alphabet string */
   @Field()
-  @IsAlpha()
   readonly category: string;
 
-  /** event's tags - an all alphabet string */
+  /** event's tags - an array of all alphabet string */
   @Field(() => [String])
   readonly tags: string[];
 }

@@ -7,3 +7,9 @@ export const makeError = (error: any): HttpException => {
 
   return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
 };
+
+export const corsConfig = {
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+  allowedHeaders: 'Content-Type, Accept',
+};

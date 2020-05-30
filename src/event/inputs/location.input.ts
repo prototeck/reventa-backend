@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNumberString } from 'class-validator';
+import { IsLatitude, IsLongitude } from 'class-validator';
 
 /**
  * defines the input schema for location
@@ -8,11 +8,11 @@ import { IsNumberString } from 'class-validator';
 export class LocationInput {
   /** location's latitude of type number */
   @Field()
-  @IsNumberString()
+  @IsLatitude()
   readonly latitude: string;
 
   /** location's longitude of type number */
   @Field()
-  @IsNumberString()
+  @IsLongitude()
   readonly longitude: string;
 }
