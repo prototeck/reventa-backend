@@ -56,6 +56,10 @@ export const EventSchema = new mongoose.Schema(
       type: Number,
       default: Date.now,
     },
+    createdBy: {
+      type: String,
+      required: true,
+    },
   },
   {
     collection: 'events',

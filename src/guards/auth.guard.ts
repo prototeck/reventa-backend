@@ -71,7 +71,7 @@ export class AuthGuard implements CanActivate {
         }
 
         request.headers.user = JSON.stringify(user);
-
+console.log(request.headers)
         return true;
       }
       return false;

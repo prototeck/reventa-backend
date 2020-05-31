@@ -10,6 +10,9 @@ export class EventDTO {
   readonly _id: string;
 
   @Field()
+  readonly createdBy: string;
+
+  @Field()
   readonly title: string;
 
   @Field()

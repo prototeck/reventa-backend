@@ -26,6 +26,7 @@ type Location {
 """The Event Model"""
 type Event {
   _id: ID!
+  createdBy: String!
   title: String!
   description: String!
   startsOn: Float!

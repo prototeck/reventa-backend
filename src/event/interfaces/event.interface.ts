@@ -11,6 +11,7 @@ export interface Location {
 export interface IEvent {
   _id: string;
   title: string;
+  createdBy: string;
   description: string;
   startOn: number;
   endsOn: number;
