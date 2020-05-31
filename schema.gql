@@ -134,7 +134,6 @@ input UpdateEventInput {
   category: String
   mainImageUrl: String
   secondaryImageUrls: [String!]
-  tickets: CreateTicketInput
   tags: [String!]
 }
 

@@ -45,12 +45,6 @@ export class UpdateEventInput {
   @Field(() => [String], { nullable: true })
   readonly secondaryImageUrls?: string[];
 
-  @Field(() => CreateTicketInput, { nullable: true })
-  @Type(() => CreateTicketInput)
-  @ValidateNested()
-  @IsOptional()
-  readonly tickets?: Ticket[];
-
   /** event's tags - an all alphabet string */
   @Field(() => [String], { nullable: true })
   readonly tags?: string[];
