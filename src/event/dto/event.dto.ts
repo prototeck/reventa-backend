@@ -1,9 +1,11 @@
 import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
 
 import { Location, Address } from '../interfaces/event.interface';
+import { Ticket } from '../interfaces/ticket.interface';
 
 import { LocationDTO } from './location.dto';
 import { AddressDTO } from './address.dto';
+import { TicketDTO } from './ticket.dto';
 
 @ObjectType('Event', { description: 'The Event Model' })
 export class EventDTO {
@@ -39,6 +41,9 @@ export class EventDTO {
 
   @Field(() => [String], { nullable: true })
   readonly secondaryImageUrls?: string[];
+
+  @Field(() => [TicketDTO], { nullable: true })
+  readonly tickets?: Ticket[];
 
   @Field(() => Float)
   readonly createdOn: number;

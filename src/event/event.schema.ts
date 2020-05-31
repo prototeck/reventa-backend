@@ -49,6 +49,42 @@ const AddressSchema = new mongoose.Schema(
   },
 );
 
+export const TicketSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 50,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  sold: {
+    type: Number,
+    default: 0,
+  },
+  type: {
+    type: String,
+    enum: ['free', 'paid'],
+    required: true,
+  },
+  currency: {
+    type: String,
+  },
+  price: {
+    type: Number,
+  },
+  startsOn: {
+    type: Number,
+    required: true,
+  },
+  endsOn: {
+    type: Number,
+    required: true,
+  },
+});
+
 export const EventSchema = new mongoose.Schema(
   {
     title: {
@@ -87,6 +123,9 @@ export const EventSchema = new mongoose.Schema(
     secondaryImageUrls: {
       type: [String],
       default: [],
+    },
+    tickets: {
+      type: [TicketSchema],
     },
     createdOn: {
       type: Number,

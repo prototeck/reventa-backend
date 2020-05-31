@@ -1,9 +1,11 @@
 import { Resolver, Args, Mutation, Query } from '@nestjs/graphql';
 
 import { EventDTO } from './dto/event.dto';
+import { TicketDTO } from './dto/ticket.dto';
 import { EventService } from './event.service';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
+import { CreateTicketInput } from './inputs/create-ticket.input';
 
 @Resolver(() => EventDTO)
 export class EventResolver {
@@ -38,5 +40,18 @@ export class EventResolver {
     const deletedEvent = await this.eventService.deleteEvent(id);
 
     return deletedEvent;
+  }
+
+  @Mutation(() => TicketDTO)
+  async createTicketForEvent(
+    @Args('eventId') eventId: string,
+    @Args('ticketInput') ticketInput: CreateTicketInput,
+  ) {
+    const eventTicket = await this.eventService.createTicketForEvent(
+      eventId,
+      ticketInput,
+    );
+
+    return eventTicket;
   }
 }

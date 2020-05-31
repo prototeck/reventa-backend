@@ -1,5 +1,7 @@
 import { Document } from 'mongoose';
 
+import { Ticket } from './ticket.interface';
+
 type Longitude = number;
 type Latitude = number;
 
@@ -29,6 +31,7 @@ export interface IEvent {
   readonly tags?: string[];
   readonly mainImageUrl?: string;
   readonly secondaryImageUrls?: string[];
+  readonly tickets: Ticket[];
   readonly createdOn: number;
   readonly updatedOn: number;
 }

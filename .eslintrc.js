@@ -20,6 +20,13 @@ module.exports = {
     node: true,
     jest: true,
   },
+  settings: {
+    "import/resolver": {
+      node: {
+        extensions: [".js", ".ts", ".d.ts"]
+      }
+    }
+  },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

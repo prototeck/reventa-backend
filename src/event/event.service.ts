@@ -6,8 +6,10 @@ import { makeError } from '../utils';
 import { Mutable } from '../types';
 
 import { Event, IEvent } from './interfaces/event.interface';
+import { Ticket, ITicket } from './interfaces/ticket.interface';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
+import { CreateTicketInput } from './inputs/create-ticket.input';
 
 const EVENT_ERRORS = {
   EVENT_NOT_FOUND: 'event does not exist',
@@ -15,7 +17,10 @@ const EVENT_ERRORS = {
 
 @Injectable()
 export class EventService {
-  constructor(@InjectModel('Event') private EventModel: Model<Event>) {}
+  constructor(
+    @InjectModel('Event') private EventModel: Model<Event>,
+    @InjectModel('Ticket') private TicketModel: Model<Ticket>,
+  ) {}
 
   /**
    *
@@ -140,6 +145,32 @@ export class EventService {
       });
 
       return deletedEvent;
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
+  async createTicketForEvent(
+    eventId: string,
+    ticketInput: CreateTicketInput,
+  ): Promise<ITicket> {
+    try {
+      const event = await this.EventModel.findOne({ _id: eventId });
+
+      if (!event) {
+        throw new HttpException(
+          EVENT_ERRORS.EVENT_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const ticket = new this.TicketModel({ ...ticketInput });
+
+      event.tickets.push(ticket);
+
+      event.save();
+
+      return ticket;
     } catch (error) {
       throw makeError(error);
     }

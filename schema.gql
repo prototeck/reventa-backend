@@ -32,6 +32,17 @@ type AddressDTO {
   country: String!
 }
 
+type TicketDTO {
+  _id: ID!
+  name: String!
+  type: String!
+  quantity: Int!
+  currency: String
+  price: Int
+  startsOn: Float!
+  endsOn: Float!
+}
+
 """The Event Model"""
 type Event {
   _id: ID!
@@ -45,6 +56,7 @@ type Event {
   tags: [String!]
   mainImageUrl: String
   secondaryImageUrls: [String!]
+  tickets: [TicketDTO!]
   createdOn: Float!
   updatedOn: Float!
 }
@@ -68,6 +80,7 @@ type Mutation {
   createEvent(input: CreateEventInput!): Event!
   updateEvent(input: UpdateEventInput!, id: String!): Event!
   deleteEvent(id: String!): Event!
+  createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): TicketDTO!
 }
 
 input CreateUserInput {
@@ -121,5 +134,16 @@ input UpdateEventInput {
   category: String
   mainImageUrl: String
   secondaryImageUrls: [String!]
+  tickets: CreateTicketInput
   tags: [String!]
+}
+
+input CreateTicketInput {
+  name: String!
+  type: String!
+  quantity: Int!
+  currency: String
+  price: Int
+  startsOn: Float!
+  endsOn: Float!
 }
