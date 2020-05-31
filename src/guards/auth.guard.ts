@@ -12,8 +12,6 @@ import {
   CognitoAccessToken,
   CognitoRefreshToken,
   CognitoUserSession,
-  CognitoUser,
-  CognitoUserPool,
 } from 'amazon-cognito-identity-js';
 import jwt from 'jwt-decode';
 
@@ -30,9 +28,11 @@ export class AuthGuard implements CanActivate {
     const { headers } = ctx;
     const { request } = ctx;
     const { idtoken, accesstoken, refreshtoken } = headers;
+
     if (idtoken && accesstoken && refreshtoken) {
       const decoded = jwt(idtoken);
       const username = decoded['cognito:username'];
+
       const idToken = new CognitoIdToken({
         IdToken: idtoken,
       });
@@ -40,6 +40,7 @@ export class AuthGuard implements CanActivate {
       const accessToken = new CognitoAccessToken({
         AccessToken: accesstoken,
       });
+
       const refreshToken = new CognitoRefreshToken({
         RefreshToken: refreshtoken,
       });
@@ -52,17 +53,6 @@ export class AuthGuard implements CanActivate {
 
       const session = new CognitoUserSession(tokenData);
 
-      const poolData = {
-        UserPoolId: global.config.aws.cognito.poolId,
-        ClientId: global.config.aws.cognito.clientId,
-      };
-      const userData = {
-        Username: username,
-        Pool: new CognitoUserPool(poolData),
-      };
-
-      const cognitoUser = new CognitoUser(userData);
-
       if (session.isValid()) {
         const user = await this.userService.findOne(username);
 
@@ -71,11 +61,13 @@ export class AuthGuard implements CanActivate {
         }
 
         request.headers.user = JSON.stringify(user);
-console.log(request.headers)
+
         return true;
       }
+
       return false;
     }
+
     return false;
   }
 }
