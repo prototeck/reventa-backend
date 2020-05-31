@@ -48,10 +48,11 @@ export class EventService {
    *
    * @public
    */
-  async createEvent(input: CreateEventInput) {
+  async createEvent(userId: string, input: CreateEventInput) {
     try {
       const event = await new this.EventModel({
         ...input,
+        createdBy: userId,
         location: {
           type: 'Point',
           coordinates: [input.location.longitude, input.location.latitude],

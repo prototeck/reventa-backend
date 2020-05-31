@@ -13,6 +13,10 @@ export class UpdateEventInput {
   @Field({ nullable: true })
   readonly title?: string;
 
+  /** user's id */
+  // @Field()
+  // readonly createdBy: string;
+
   /** event's description - an all alphabet string */
   @Field({ nullable: true })
   readonly description?: string;
