@@ -1,4 +1,8 @@
 import { Resolver, Args, Mutation, Query } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+
+import { AuthGuard } from '../guards/auth.guard';
+// import { User } from '../decorators/user.decorator';
 
 import { EventDTO } from './dto/event.dto';
 import { EventService } from './event.service';
@@ -9,6 +13,7 @@ import { UpdateEventInput } from './inputs/update-event.input';
 export class EventResolver {
   constructor(private readonly eventService: EventService) {}
 
+  @UseGuards(AuthGuard)
   @Query(() => [EventDTO])
   async events() {
     const events = await this.eventService.findAll();

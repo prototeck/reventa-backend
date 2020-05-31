@@ -36,6 +36,16 @@ export class UserService {
     }
   }
 
+  async findOne(id: string): Promise<IUser> {
+    try {
+      const user = await this.UserModel.findOne({ _id: id }).lean();
+      
+      return user;
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
   /**
    * * find the user in database by unique email
    * @param email - email id of user
