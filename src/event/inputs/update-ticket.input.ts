@@ -2,7 +2,7 @@ import { InputType, Field, Int, Float } from '@nestjs/graphql';
 
 @InputType()
 export class UpdateTicketInput {
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   readonly quantity?: number;
 
   @Field({ nullable: true })
@@ -11,9 +11,9 @@ export class UpdateTicketInput {
   @Field(() => Int, { nullable: true })
   readonly price?: string;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   readonly startsOn?: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   readonly endsOn?: number;
 }

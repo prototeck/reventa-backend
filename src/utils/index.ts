@@ -14,7 +14,7 @@ export const corsConfig = {
   allowedHeaders: 'Content-Type, Accept',
 };
 
-export function prepareSubdocumentUpdate(input, basePath) {
+export function prepareSubdocumentUpdate(input, basePath: string) {
   const subdocumentUpdate = Object.entries(input).reduce(
     (memo, [key, value]) => ({
       ...memo,

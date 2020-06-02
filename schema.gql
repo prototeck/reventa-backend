@@ -150,9 +150,9 @@ input CreateTicketInput {
 }
 
 input UpdateTicketInput {
-  quantity: Int!
+  quantity: Int
   currency: String
   price: Int
-  startsOn: Float!
-  endsOn: Float!
+  startsOn: Float
+  endsOn: Float
 }
