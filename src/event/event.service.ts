@@ -255,7 +255,7 @@ export class EventService {
         'tickets',
       );
 
-      const updatedTicket = await this.EventModel.findOneAndUpdate(
+      await this.EventModel.updateOne(
         {
           _id: eventId,
           'tickets._id': ticketId,
@@ -263,12 +263,9 @@ export class EventService {
         {
           $set: { ...subDocumentUpdate },
         },
-        {
-          new: true,
-        },
       );
 
-      return updatedTicket;
+      return { _id: ticketId, ...ticketFound, ...ticketInput };
     } catch (error) {
       throw makeError(error);
     }
