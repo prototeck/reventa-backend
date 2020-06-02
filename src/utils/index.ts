@@ -13,3 +13,15 @@ export const corsConfig = {
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   allowedHeaders: 'Content-Type, Accept',
 };
+
+export function prepareSubdocumentUpdate(input, basePath) {
+  const subdocumentUpdate = Object.entries(input).reduce(
+    (memo, [key, value]) => ({
+      ...memo,
+      [`${basePath}${'.$.'}${key}`]: value,
+    }),
+    {},
+  );
+
+  return subdocumentUpdate;
+}

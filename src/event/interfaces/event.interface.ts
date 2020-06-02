@@ -22,6 +22,7 @@ export interface Address {
 export interface IEvent {
   readonly _id: string;
   readonly title: string;
+  readonly createdBy: string;
   readonly description?: string;
   readonly startOn: number;
   readonly endsOn: number;

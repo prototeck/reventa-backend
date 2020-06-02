@@ -46,6 +46,7 @@ type TicketDTO {
 """The Event Model"""
 type Event {
   _id: ID!
+  createdBy: String!
   title: String!
   description: String
   startsOn: Float!
@@ -81,6 +82,7 @@ type Mutation {
   updateEvent(input: UpdateEventInput!, id: String!): Event!
   deleteEvent(id: String!): Event!
   createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): TicketDTO!
+  updateTicketForEvent(ticketInput: UpdateTicketInput!, ticketId: String!, eventId: String!): TicketDTO!
 }
 
 input CreateUserInput {
@@ -140,6 +142,14 @@ input UpdateEventInput {
 input CreateTicketInput {
   name: String!
   type: String!
+  quantity: Int!
+  currency: String
+  price: Int
+  startsOn: Float!
+  endsOn: Float!
+}
+
+input UpdateTicketInput {
   quantity: Int!
   currency: String
   price: Int

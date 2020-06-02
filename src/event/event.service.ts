@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { makeError } from '../utils';
+import { makeError, prepareSubdocumentUpdate } from '../utils';
 import { Mutable } from '../types';
 
 import { Event, IEvent } from './interfaces/event.interface';
@@ -10,9 +10,16 @@ import { Ticket, ITicket } from './interfaces/ticket.interface';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 import { CreateTicketInput } from './inputs/create-ticket.input';
+import { UpdateTicketInput } from './inputs/update-ticket.input';
 
 const EVENT_ERRORS = {
-  EVENT_NOT_FOUND: 'event does not exist',
+  EVENT_NOT_FOUND: 'Event does not exist',
+} as const;
+
+const TICKET_ERRORS = {
+  TICKET_NOT_FOUND: 'Ticket does not exist',
+  EMPTY: 'Price and Currency must be empty for free ticket type ',
+  ENDTIME_LESS_THAN_STARTTIME: 'End time cannot be less than Start time',
 } as const;
 
 @Injectable()
@@ -53,10 +60,11 @@ export class EventService {
    *
    * @public
    */
-  async createEvent(input: CreateEventInput) {
+  async createEvent(userId: string, input: CreateEventInput) {
     try {
       const event = await new this.EventModel({
         ...input,
+        createdBy: userId,
         location: {
           type: 'Point',
           coordinates: [input.location.longitude, input.location.latitude],
@@ -171,6 +179,73 @@ export class EventService {
       event.save();
 
       return ticket;
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
+  async updateTicketForEvent(
+    eventId: string,
+    ticketId: string,
+    ticketInput: UpdateTicketInput,
+  ) {
+    try {
+      const event = await this.EventModel.findOne({ _id: eventId });
+      if (!event) {
+        throw new HttpException(
+          EVENT_ERRORS.EVENT_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // const ticket = await this.EventModel.find({
+      //   tickets: {
+      //     $elemMatch: {
+      //       _id: ticketId,
+      //     },
+      //   },
+      // });
+      // console.log(event)
+      // const ticket = await this.EventModel.find().elemMatch('tickets', {
+      //   _id: ticketId,
+      // });
+      // console.log(ticket);
+      // eslint-disable-next-line no-underscore-dangle
+      const ticket = event.tickets.filter(ele => ele._id == ticketId)[0];
+      console.log(ticket);
+      if (!ticket) {
+        throw new HttpException(
+          TICKET_ERRORS.TICKET_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      // if (ticket.type === 'free' && (ticket.currency || ticket.price)) {
+        
+      //   throw new HttpException(TICKET_ERRORS.EMPTY, HttpStatus.NOT_FOUND);
+      // } else if (ticket.type === 'free') {
+      //   console.log('free');
+      // }
+
+      if (ticketInput.endsOn < ticketInput.startsOn) {
+        throw new HttpException(
+          TICKET_ERRORS.ENDTIME_LESS_THAN_STARTTIME,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      const newUpdatedInput = prepareSubdocumentUpdate({ ...ticketInput }, 'tickets');
+      console.log(newUpdatedInput);
+      const updatedTicket = await this.EventModel.findOneAndUpdate(
+        {
+          _id: eventId,
+          // tickets: [{ _id: ticketId }],
+        },
+        {
+          $set: { ...newUpdatedInput },
+        },
+      );
+
+      return updatedTicket;
     } catch (error) {
       throw makeError(error);
     }
