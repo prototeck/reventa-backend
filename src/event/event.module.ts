@@ -14,5 +14,6 @@ import { EventSchema, TicketSchema } from './event.schema';
     UserModule,
   ],
   providers: [EventService, EventResolver],
+  exports: [EventService],
 })
 export class EventModule {}

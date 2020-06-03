@@ -12,6 +12,7 @@ import { Config } from './types.d';
 import { corsConfig } from './utils';
 import { UserModule } from './user/user.module';
 import { EventModule } from './event/event.module';
+import { BookingModule } from './booking/booking.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 
 const environment = process.env.NODE_ENV || 'development';
@@ -69,6 +70,7 @@ export const pubsub = new PubSub();
     UserModule,
     AuthenticationModule,
     EventModule,
+    BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

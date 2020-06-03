@@ -62,10 +62,28 @@ type Event {
   updatedOn: Float!
 }
 
+"""The Booking Model"""
+type Booking {
+  _id: ID!
+  eventId: ID!
+  ticketId: ID!
+  userId: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+  eventTitle: String!
+  location: Location!
+  address: AddressDTO
+  ticketName: String!
+  startsOn: Float!
+  endsOn: Float!
+}
+
 type Query {
   users: [User!]!
   signinUser(input: LoginUserInput!): AuthInfo!
   events: [Event!]!
+  bookings: [Booking!]!
 }
 
 input LoginUserInput {
@@ -83,6 +101,8 @@ type Mutation {
   deleteEvent(id: String!): Event!
   createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): TicketDTO!
   updateTicketForEvent(ticketInput: UpdateTicketInput!, ticketId: String!, eventId: String!): TicketDTO!
+  createBooking(ticketId: String!, eventId: String!): Booking!
+  deleteBooking(id: String!): Booking!
 }
 
 input CreateUserInput {

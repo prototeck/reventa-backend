@@ -53,6 +53,19 @@ export class EventService {
     }
   }
 
+  async findOne(id: string, ticketId: string): Promise<IEvent> {
+    try {
+      const event = await this.EventModel.findOne({
+        _id: id,
+        'tickets._id': ticketId,
+      }).lean();
+
+      return event;
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
   /**
    * create a new event in the database from the provided input
    * @param input - event details input object
@@ -221,7 +234,7 @@ export class EventService {
       }
 
       // if (ticket.type === 'free' && (ticket.currency || ticket.price)) {
-        
+
       //   throw new HttpException(TICKET_ERRORS.EMPTY, HttpStatus.NOT_FOUND);
       // } else if (ticket.type === 'free') {
       //   console.log('free');
@@ -233,7 +246,10 @@ export class EventService {
           HttpStatus.NOT_FOUND,
         );
       }
-      const newUpdatedInput = prepareSubdocumentUpdate({ ...ticketInput }, 'tickets');
+      const newUpdatedInput = prepareSubdocumentUpdate(
+        { ...ticketInput },
+        'tickets',
+      );
       console.log(newUpdatedInput);
       const updatedTicket = await this.EventModel.findOneAndUpdate(
         {

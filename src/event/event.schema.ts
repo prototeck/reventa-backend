@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-const LocationSchema = new mongoose.Schema(
+export const LocationSchema = new mongoose.Schema(
   {
     // 'location type' schema
     type: {
@@ -18,7 +18,7 @@ const LocationSchema = new mongoose.Schema(
   },
 );
 
-const AddressSchema = new mongoose.Schema(
+export const AddressSchema = new mongoose.Schema(
   {
     addressLine1: {
       type: String,
