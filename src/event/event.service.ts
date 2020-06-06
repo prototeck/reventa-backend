@@ -18,7 +18,8 @@ const EVENT_ERRORS = {
 
 const TICKET_ERRORS = {
   TICKET_NOT_FOUND: 'Ticket does not exist',
-  EMPTY: 'Price and Currency must be empty for free ticket type ',
+  FIELD_REQUIRED: (field: string) => `${field} is required`,
+  FIELD_NOT_ALLOWED: (field: string) => `${field} cannot be updated`,
   ENDTIME_LESS_THAN_STARTTIME: 'End time cannot be less than Start time',
 } as const;
 
@@ -53,11 +54,10 @@ export class EventService {
     }
   }
 
-  async findOne(id: string, ticketId: string): Promise<IEvent> {
+  async findOne(id: string): Promise<IEvent> {
     try {
       const event = await this.EventModel.findOne({
         _id: id,
-        'tickets._id': ticketId,
       }).lean();
 
       return event;
@@ -203,64 +203,116 @@ export class EventService {
     ticketInput: UpdateTicketInput,
   ) {
     try {
-      const event = await this.EventModel.findOne({ _id: eventId });
-      if (!event) {
-        throw new HttpException(
-          EVENT_ERRORS.EVENT_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
-      }
+      const eventWithTicket = await this.EventModel.findOne({
+        _id: eventId,
+        'tickets._id': ticketId,
+      });
 
-      // const ticket = await this.EventModel.find({
-      //   tickets: {
-      //     $elemMatch: {
-      //       _id: ticketId,
-      //     },
-      //   },
-      // });
-      // console.log(event)
-      // const ticket = await this.EventModel.find().elemMatch('tickets', {
-      //   _id: ticketId,
-      // });
-      // console.log(ticket);
-      // eslint-disable-next-line no-underscore-dangle
-      const ticket = event.tickets.filter(ele => ele._id == ticketId)[0];
-      console.log(ticket);
-      if (!ticket) {
+      if (!eventWithTicket) {
         throw new HttpException(
           TICKET_ERRORS.TICKET_NOT_FOUND,
           HttpStatus.NOT_FOUND,
         );
       }
 
-      // if (ticket.type === 'free' && (ticket.currency || ticket.price)) {
+      // eslint-disable-next-line no-underscore-dangle
+      const ticketFound = eventWithTicket.tickets.find(
+        // eslint-disable-next-line no-underscore-dangle
+        ticket => `${ticket._id}` === ticketId,
+      );
 
-      //   throw new HttpException(TICKET_ERRORS.EMPTY, HttpStatus.NOT_FOUND);
-      // } else if (ticket.type === 'free') {
-      //   console.log('free');
-      // }
+      // throw new HttpException('testing', HttpStatus.NOT_FOUND);
 
-      if (ticketInput.endsOn < ticketInput.startsOn) {
+      if (ticketFound.type === 'free') {
+        if (ticketInput.currency) {
+          throw new HttpException(
+            TICKET_ERRORS.FIELD_NOT_ALLOWED('Currency'),
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+
+        if (ticketInput.price) {
+          throw new HttpException(
+            TICKET_ERRORS.FIELD_NOT_ALLOWED('Price'),
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+
+      if (ticketInput.startsOn && !ticketInput.endsOn) {
         throw new HttpException(
-          TICKET_ERRORS.ENDTIME_LESS_THAN_STARTTIME,
-          HttpStatus.NOT_FOUND,
+          TICKET_ERRORS.FIELD_REQUIRED('End Time'),
+          HttpStatus.BAD_REQUEST,
         );
       }
-      const newUpdatedInput = prepareSubdocumentUpdate(
+
+      if (ticketInput.endsOn && !ticketInput.startsOn) {
+        throw new HttpException(
+          TICKET_ERRORS.FIELD_REQUIRED('Start Time'),
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (ticketInput.startsOn && ticketInput.endsOn) {
+        if (ticketInput.endsOn < ticketInput.startsOn) {
+          throw new HttpException(
+            TICKET_ERRORS.ENDTIME_LESS_THAN_STARTTIME,
+            HttpStatus.BAD_REQUEST,
+          );
+        }
+      }
+
+      const subDocumentUpdate = prepareSubdocumentUpdate(
         { ...ticketInput },
         'tickets',
       );
-      console.log(newUpdatedInput);
-      const updatedTicket = await this.EventModel.findOneAndUpdate(
+
+      await this.EventModel.updateOne(
         {
           _id: eventId,
-          // tickets: [{ _id: ticketId }],
+          'tickets._id': ticketId,
         },
         {
-          $set: { ...newUpdatedInput },
+          $set: { ...subDocumentUpdate },
         },
       );
 
+      return { _id: ticketId, ...ticketFound, ...ticketInput };
+    } catch (error) {
+      throw makeError(error);
+    }
+  }
+
+  /**
+   * increase or decrease value of sold and quantity respectively on being called
+   * @param eventId
+   * @param ticketId
+   * @returns updatedTicket
+   */
+
+  async updateTicket(eventId: string, ticketId: string): Promise<ITicket> {
+    try {
+      const eventWithTicket = await this.EventModel.findOne({
+        _id: eventId,
+        'tickets._id': ticketId,
+      });
+
+      if (!eventWithTicket) {
+        throw new HttpException(
+          TICKET_ERRORS.TICKET_NOT_FOUND,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+
+      const updatedTicket = await this.EventModel.updateOne(
+        {
+          _id: eventId,
+          'tickets._id': ticketId,
+        },
+        {
+          $inc: { 'tickets.$.sold': 1, 'tickets.$.quantity': -1 },
+        },
+      );
       return updatedTicket;
     } catch (error) {
       throw makeError(error);

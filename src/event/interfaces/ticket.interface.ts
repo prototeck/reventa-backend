@@ -5,6 +5,7 @@ export interface ITicket {
   readonly name: string;
   readonly type: string;
   readonly quantity: number;
+  readonly sold: number;
   readonly currency?: string;
   readonly price?: string;
   readonly startsOn: number;

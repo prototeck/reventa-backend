@@ -14,6 +14,9 @@ export class TicketDTO {
   @Field(() => Int)
   readonly quantity: number;
 
+  @Field(() => Int)
+  readonly sold: number;
+
   @Field({ nullable: true })
   readonly currency?: string;
 

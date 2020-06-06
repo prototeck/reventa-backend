@@ -19,6 +19,7 @@ export const UserSchema = new mongoose.Schema(
       unique: true,
       trim: true,
       lowercase: true,
+      index: true,
       // validate: {
       //   validator: (value) => isEmail(value),
       //   message: (props) => `${props.value} is not a valid e-mail address.`,

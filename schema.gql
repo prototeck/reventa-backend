@@ -37,6 +37,7 @@ type TicketDTO {
   name: String!
   type: String!
   quantity: Int!
+  sold: Int!
   currency: String
   price: Int
   startsOn: Float!
@@ -68,22 +69,24 @@ type Booking {
   eventId: ID!
   ticketId: ID!
   userId: ID!
-  firstName: String!
-  lastName: String!
-  email: String!
-  eventTitle: String!
+  firstName: String
+  lastName: String
+  email: String
+  eventTitle: String
   location: Location!
   address: AddressDTO
-  ticketName: String!
+  ticketName: String
   startsOn: Float!
   endsOn: Float!
+  status: String!
+  cancellationReason: String!
 }
 
 type Query {
   users: [User!]!
   signinUser(input: LoginUserInput!): AuthInfo!
   events: [Event!]!
-  bookings: [Booking!]!
+  getBookingByEvent(ticketId: String, eventId: String!): [Booking!]!
 }
 
 input LoginUserInput {
@@ -102,7 +105,8 @@ type Mutation {
   createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): TicketDTO!
   updateTicketForEvent(ticketInput: UpdateTicketInput!, ticketId: String!, eventId: String!): TicketDTO!
   createBooking(ticketId: String!, eventId: String!): Booking!
-  deleteBooking(id: String!): Booking!
+  cancelBookingById(cancellationReason: String!, bookingId: String!): Booking!
+  cancelBookings(ticketId: String, input: BookingInput!, eventId: String!): Int!
 }
 
 input CreateUserInput {
@@ -170,9 +174,13 @@ input CreateTicketInput {
 }
 
 input UpdateTicketInput {
-  quantity: Int!
+  quantity: Int
   currency: String
   price: Int
-  startsOn: Float!
-  endsOn: Float!
+  startsOn: Float
+  endsOn: Float
+}
+
+input BookingInput {
+  cancellationReason: String!
 }

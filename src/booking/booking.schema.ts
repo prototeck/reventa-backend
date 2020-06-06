@@ -2,6 +2,12 @@ import * as mongoose from 'mongoose';
 
 import { LocationSchema, AddressSchema } from '../event/event.schema';
 
+export const BOOKING_STATUSES = Object.freeze({
+  CANCELLED: 'Cancelled',
+  PENDING: 'Pending Confirmation',
+  CONFIRMED: 'Confirmed',
+});
+
 export const BookingSchema = new mongoose.Schema(
   {
     eventId: {
@@ -52,6 +58,14 @@ export const BookingSchema = new mongoose.Schema(
     endsOn: {
       type: Number,
       required: true,
+    },
+    cancellationReason: {
+      type: String,
+    },
+    status: {
+      type: String,
+      enum: Object.values(BOOKING_STATUSES),
+      index: true,
     },
   },
   {
