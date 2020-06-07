@@ -13,15 +13,15 @@ import { BOOKING_STATUSES } from './booking.schema';
 
 const TICKET_ERRORS = {
   TICKETS_UNAVAILABLE: 'Tickets unavailable for this event',
-  TICKET_NOT_FOUND: 'Ticket does not exists',
+  TICKET_NOT_FOUND: 'Ticket does not exist',
 } as const;
 
 const EVENT_ERRORS = {
-  EVENT_NOT_FOUND: 'Event does not exists',
+  EVENT_NOT_FOUND: 'Event does not exist',
 } as const;
 
 const BOOKING_ERRORS = {
-  BOOKING_NOT_FOUND: 'Booking does not exists',
+  BOOKING_NOT_FOUND: 'Booking does not exist',
 } as const;
 
 @Injectable()
@@ -54,16 +54,19 @@ export class BookingService {
           HttpStatus.NOT_FOUND,
         );
       }
+
       const ticketFound = event.tickets?.find(
         // eslint-disable-next-line no-underscore-dangle
         ticket => `${ticket._id}` === ticketId,
       );
+
       if (!ticketFound) {
         throw new HttpException(
           TICKET_ERRORS.TICKET_NOT_FOUND,
           HttpStatus.NOT_FOUND,
         );
       }
+
       if (ticketFound.quantity === 0) {
         throw new HttpException(
           TICKET_ERRORS.TICKETS_UNAVAILABLE,
@@ -121,6 +124,7 @@ export class BookingService {
       if (ticketId) {
         id.ticketId = ticketId;
       }
+
       const bookings = await this.BookingModel.find(id);
 
       return bookings;
@@ -135,7 +139,6 @@ export class BookingService {
    * @param cancellationReason
    * @returns cancelled booking with cancelled value for status
    */
-
   async cancelBookingById(
     bookingId: string,
     cancellationReason: string,
@@ -144,6 +147,7 @@ export class BookingService {
       const existingBooking = await this.BookingModel.findOne({
         _id: bookingId,
       }).lean();
+
       if (
         !existingBooking ||
         (existingBooking &&
