@@ -183,7 +183,7 @@ export class BookingService {
     eventId: string,
     ticketId: string,
     input: BookingInput,
-  ): Promise<number> {
+  ): Promise<[IBooking]> {
     try {
       const existingEvent = await this.eventService.findOne(eventId);
       if (!existingEvent) {
@@ -219,7 +219,9 @@ export class BookingService {
         },
       });
 
-      return cancelBookings.nModified;
+      const modifiedBookings = await this.BookingModel.find(id);
+
+      return cancelBookings;
     } catch (error) {
       throw makeError(error);
     }

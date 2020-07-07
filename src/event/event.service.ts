@@ -47,7 +47,7 @@ export class EventService {
       //   },
       // }
       const events = await this.EventModel.find({}).lean();
-
+console.log(events.length)
       return events;
     } catch (error) {
       throw makeError(error);

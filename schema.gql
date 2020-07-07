@@ -59,8 +59,8 @@ type Event {
   mainImageUrl: String
   secondaryImageUrls: [String!]
   tickets: [TicketDTO!]
-  createdOn: Float!
-  updatedOn: Float!
+  createdOn: Float
+  updatedOn: Float
 }
 
 """The Booking Model"""

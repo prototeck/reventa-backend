@@ -198,7 +198,7 @@ export class UserService {
         existingUser,
         input.password,
       );
-
+      console.log(result)
       return result;
     } catch (error) {
       throw makeError(error);

@@ -48,9 +48,9 @@ export class EventDTO {
   @Field(() => [TicketDTO], { nullable: true })
   readonly tickets?: Ticket[];
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   readonly createdOn: number;
 
-  @Field(() => Float)
+  @Field(() => Float, { nullable: true })
   readonly updatedOn: number;
 }

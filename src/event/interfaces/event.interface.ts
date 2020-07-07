@@ -33,8 +33,8 @@ export interface IEvent {
   readonly mainImageUrl?: string;
   readonly secondaryImageUrls?: string[];
   readonly tickets: Ticket[];
-  readonly createdOn: number;
-  readonly updatedOn: number;
+  readonly createdOn?: number;
+  readonly updatedOn?: number;
 }
 
 export interface Event extends IEvent, Document {
