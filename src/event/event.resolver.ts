@@ -25,6 +25,14 @@ export class EventResolver {
   }
 
   @UseGuards(AuthGuard)
+  @Query(() => EventDTO)
+  async getEventById(@Args('id') id: string) {
+    const event = await this.eventService.findOne(id);
+
+    return event;
+  }
+
+  @UseGuards(AuthGuard)
   @Mutation(() => EventDTO)
   async createEvent(
     @Args('input') input: CreateEventInput,
@@ -80,5 +88,4 @@ export class EventResolver {
 
     return eventTicket;
   }
-
 }
