@@ -20,7 +20,7 @@ import { UserService } from '../user/user.service';
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    @Inject('UserService') private readonly userService: UserService,
+    @Inject('UserService') private readonly _userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -54,7 +54,7 @@ export class AuthGuard implements CanActivate {
       const session = new CognitoUserSession(tokenData);
 
       if (session.isValid()) {
-        const user = await this.userService.findOne(username);
+        const user = await this._userService.findOne(username);
 
         if (!user) {
           throw new HttpException('user not found', HttpStatus.NOT_FOUND);

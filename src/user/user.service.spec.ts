@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
@@ -10,7 +9,7 @@ import { AuthenticationService } from '../authentication/authentication.service'
 import { UserService } from './user.service';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
-import { IUser, AuthInfo } from './interfaces/user.interface';
+import { IUser, IUserLean, IAuthInfo } from './interfaces/user.interface';
 import { LoginUserInput } from './inputs/login-user.input';
 
 class UserModelMock {
@@ -69,7 +68,7 @@ describe('UserService', () => {
   });
 
   describe('find all function', () => {
-    let result: IUser[];
+    let result: IUserLean[];
     let mockedLean: jest.Mock<any[]>;
 
     beforeEach(async () => {
@@ -147,7 +146,7 @@ describe('UserService', () => {
     it('should throw error when an user with same email exists', async done => {
       jest
         .spyOn(service, 'findByEmail')
-        .mockImplementation(async () => (createInput as any) as IUser);
+        .mockImplementation(async () => (createInput as any) as IUserLean);
 
       service
         .createUser(createInput)
@@ -177,7 +176,6 @@ describe('UserService', () => {
       it('should call the UserModel save method and return correct result', () => {
         expect(UserModelMock.prototype.save).toHaveBeenCalled();
         expect(result).toMatchObject(createInput);
-        // eslint-disable-next-line no-underscore-dangle
         expect(result._id).toBeDefined();
       });
 
@@ -198,7 +196,7 @@ describe('UserService', () => {
     };
 
     // mocked to resolve for findByEmail
-    const mockedUser: IUser = {
+    const mockedUser: IUserLean = {
       _id: Types.ObjectId().toHexString(),
       firstName: 'Aditya',
       lastName: 'Loshali',
@@ -240,8 +238,8 @@ describe('UserService', () => {
     describe('when input data is correct', () => {
       // dummy tokens to return as mocked result
       // and to be used in expect
-      const tokens: AuthInfo = ({} as any) as AuthInfo;
-      let result: AuthInfo;
+      const tokens: IAuthInfo = ({} as any) as IAuthInfo;
+      let result: IAuthInfo;
 
       // mock the functions / business logic inside the login service
       // to emulate success data with no error

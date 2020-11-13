@@ -1,6 +1,6 @@
 import { ObjectType, ID, Field, Float } from '@nestjs/graphql';
 
-import { Location, Address } from '../../event/interfaces/event.interface';
+import { ILocation, IAddress } from '../../event/interfaces/event.interface';
 import { LocationDTO } from '../../event/dto/location.dto';
 import { AddressDTO } from '../../event/dto/address.dto';
 
@@ -31,10 +31,10 @@ export class BookingDto {
   readonly eventTitle?: string;
 
   @Field(() => LocationDTO)
-  readonly location: Location;
+  readonly location: ILocation;
 
   @Field(() => AddressDTO, { nullable: true })
-  readonly address?: Address;
+  readonly address?: IAddress;
 
   @Field({ nullable: true })
   readonly ticketName?: string;

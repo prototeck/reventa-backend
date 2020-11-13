@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { AuthenticationService } from '../authentication/authentication.service';
 import { makeError } from '../utils';
 
-import { User, IUser } from './interfaces/user.interface';
+import { IUserLean, IUser } from './interfaces/user.interface';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
 import { ConfirmUserInput } from './inputs/confirm-user.input';
@@ -19,26 +19,27 @@ const USER_ERRORS = {
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel('User') private UserModel: Model<User>,
-    private readonly authenticationService: AuthenticationService,
+    @InjectModel('User') private _userModel: Model<IUser>,
+    private readonly _authenticationService: AuthenticationService,
   ) {}
 
   /**
    * * finds all the users in the database
    * @returns an array of all the User type records
    */
-  async findAll(): Promise<IUser[]> {
+  async findAll(): Promise<IUserLean[]> {
     try {
-      const users = await this.UserModel.find({}).lean();
+      const users = await this._userModel.find({}).lean();
+
       return users;
     } catch (error) {
       throw makeError(error);
     }
   }
 
-  async findOne(id: string): Promise<IUser> {
+  async findOne(id: string): Promise<IUserLean> {
     try {
-      const user = await this.UserModel.findOne({ _id: id }).lean();
+      const user = await this._userModel.findOne({ _id: id }).lean();
 
       return user;
     } catch (error) {
@@ -51,8 +52,8 @@ export class UserService {
    * @param email - email id of user
    * @returns found User type record
    */
-  async findByEmail(email: string): Promise<IUser> {
-    const user = await this.UserModel.findOne({ email }).lean();
+  async findByEmail(email: string): Promise<IUserLean> {
+    const user = await this._userModel.findOne({ email }).lean();
 
     return user;
   }
@@ -73,9 +74,9 @@ export class UserService {
         throw new HttpException(USER_ERRORS.USER_EXISTS, HttpStatus.CONFLICT);
       }
 
-      const user = await new this.UserModel({ ...input }).save();
+      const user = await new this._userModel({ ...input }).save();
 
-      await this.authenticationService.userSignup(user, input.password);
+      await this._authenticationService.userSignup(user, input.password);
 
       return user;
     } catch (error) {
@@ -93,7 +94,7 @@ export class UserService {
    */
   async updateUser(id: string, updateInput: UpdateUserInput): Promise<IUser> {
     try {
-      const existingUser = await this.UserModel.findOne({ _id: id }).lean();
+      const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
         throw new HttpException(
@@ -102,7 +103,7 @@ export class UserService {
         );
       }
 
-      const updatedUser = await this.UserModel.findOneAndUpdate(
+      const updatedUser = await this._userModel.findOneAndUpdate(
         {
           _id: id,
         },
@@ -129,7 +130,7 @@ export class UserService {
    */
   async deleteUser(id: string): Promise<IUser> {
     try {
-      const existingUser = await this.UserModel.findOne({ _id: id }).lean();
+      const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
         throw new HttpException(
@@ -138,7 +139,7 @@ export class UserService {
         );
       }
 
-      const deletedUser = await this.UserModel.findOneAndDelete({
+      const deletedUser = await this._userModel.findOneAndDelete({
         _id: id,
       });
 
@@ -164,7 +165,7 @@ export class UserService {
         );
       }
 
-      const result = await this.authenticationService.confirmCode(
+      const result = await this._authenticationService.confirmCode(
         existingUser,
         input.code,
       );
@@ -194,11 +195,11 @@ export class UserService {
         );
       }
 
-      const result = await this.authenticationService.userSignin(
+      const result = await this._authenticationService.userSignin(
         existingUser,
         input.password,
       );
-      console.log(result)
+
       return result;
     } catch (error) {
       throw makeError(error);

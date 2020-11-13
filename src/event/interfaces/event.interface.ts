@@ -1,16 +1,16 @@
 import { Document } from 'mongoose';
 
-import { Ticket } from './ticket.interface';
+import { ITicketLean } from './ticket.interface';
 
 type Longitude = number;
 type Latitude = number;
 
-export interface Location {
+export interface ILocation {
   readonly type: string;
   readonly coordinates: [Longitude, Latitude];
 }
 
-export interface Address {
+export interface IAddress {
   readonly addressLine1: string;
   readonly addressLine2?: string;
   readonly city: string;
@@ -19,24 +19,24 @@ export interface Address {
   readonly country: string;
 }
 
-export interface IEvent {
+export interface IEventLean {
   readonly _id: string;
   readonly title: string;
   readonly createdBy: string;
   readonly description?: string;
   readonly startOn: number;
   readonly endsOn: number;
-  readonly location: Location;
-  readonly address?: Address;
+  readonly location: ILocation;
+  readonly address?: IAddress;
   readonly category: string;
   readonly tags?: string[];
   readonly mainImageUrl?: string;
   readonly secondaryImageUrls?: string[];
-  readonly tickets: Ticket[];
+  readonly tickets: ITicketLean[];
   readonly createdOn?: number;
   readonly updatedOn?: number;
 }
 
-export interface Event extends IEvent, Document {
+export interface IEvent extends IEventLean, Document {
   _id: string;
 }

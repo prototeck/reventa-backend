@@ -10,7 +10,7 @@ import { BookingDto } from './dto/booking.dto';
 
 @Resolver(() => BookingDto)
 export class BookingResolver {
-  constructor(private readonly bookingService: BookingService) {}
+  constructor(private readonly _bookingService: BookingService) {}
 
   @UseGuards(AuthGuard)
   @Query(() => [BookingDto])
@@ -18,7 +18,7 @@ export class BookingResolver {
     @Args('eventId') eventId: string,
     @Args('ticketId', { nullable: true }) ticketId?: string,
   ) {
-    const bookings = await this.bookingService.findBookingById(
+    const bookings = await this._bookingService.findBookingById(
       eventId,
       ticketId,
     );
@@ -33,7 +33,7 @@ export class BookingResolver {
     @Args('ticketId') ticketId: string,
     @User() user: User,
   ) {
-    const booking = await this.bookingService.createBooking(
+    const booking = await this._bookingService.createBooking(
       eventId,
       ticketId,
       user,
@@ -48,7 +48,7 @@ export class BookingResolver {
     @Args('bookingId') bookingId: string,
     @Args('cancellationReason') cancellationReason: string,
   ) {
-    const cancelledBooking = await this.bookingService.cancelBookingById(
+    const cancelledBooking = await this._bookingService.cancelBookingById(
       bookingId,
       cancellationReason,
     );
@@ -63,12 +63,12 @@ export class BookingResolver {
     @Args('input') input: BookingInput,
     @Args('ticketId', { nullable: true }) ticketId?: string,
   ) {
-    const cancelledBookings = await this.bookingService.cancelBookings(
+    const cancelledBookings = await this._bookingService.cancelBookings(
       eventId,
       ticketId,
       input,
     );
-console.log("cancelledBookings",cancelledBookings)
+
     return cancelledBookings;
   }
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
@@ -130,7 +129,6 @@ describe('Event Service', () => {
         });
         expect(EventModelMock.prototype.save).toHaveBeenCalled();
         expect(result).toMatchObject(createInput);
-        // eslint-disable-next-line no-underscore-dangle
         expect(result._id).toBeDefined();
       });
     });

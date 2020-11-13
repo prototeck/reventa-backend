@@ -2,7 +2,7 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-import { Address } from '../interfaces/event.interface';
+import { IAddress } from '../interfaces/event.interface';
 
 import { LocationInput } from './location.input';
 import { AddressInput } from './address.input';
@@ -38,7 +38,7 @@ export class CreateEventInput {
   @Field(() => AddressInput, { nullable: true })
   @Type(() => AddressInput)
   @ValidateNested()
-  readonly address?: Address;
+  readonly address?: IAddress;
 
   /** event's category - an all alphabet string */
   @Field()

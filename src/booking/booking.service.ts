@@ -3,12 +3,12 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { makeError } from '../utils';
-import { User } from '../user/interfaces/user.interface';
+import { User } from '../decorators';
 import { EventService } from '../event/event.service';
 import { Mutable } from '../types';
 
 import { BookingInput } from './inputs/booking.input';
-import { Booking, IBooking } from './interfaces/booking.interface';
+import { IBooking } from './interfaces/booking.interface';
 import { BOOKING_STATUSES } from './booking.schema';
 
 const TICKET_ERRORS = {
@@ -27,8 +27,8 @@ const BOOKING_ERRORS = {
 @Injectable()
 export class BookingService {
   constructor(
-    @InjectModel('Booking') private BookingModel: Model<Booking>,
-    private readonly eventService: EventService,
+    @InjectModel('Booking') private _bookingModel: Model<IBooking>,
+    private readonly _eventService: EventService,
   ) {}
 
   /**
@@ -44,9 +44,9 @@ export class BookingService {
     eventId: string,
     ticketId: string,
     user: User,
-  ): Promise<Booking> {
+  ): Promise<IBooking> {
     try {
-      const event = await this.eventService.findOne(eventId);
+      const event = await this._eventService.findOne(eventId);
 
       if (!event) {
         throw new HttpException(
@@ -56,7 +56,6 @@ export class BookingService {
       }
 
       const ticketFound = event.tickets?.find(
-        // eslint-disable-next-line no-underscore-dangle
         ticket => `${ticket._id}` === ticketId,
       );
 
@@ -74,10 +73,9 @@ export class BookingService {
         );
       }
 
-      const booking = await new this.BookingModel({
+      const booking = await new this._bookingModel({
         eventId,
         ticketId,
-        // eslint-disable-next-line no-underscore-dangle
         userId: user._id,
         firstName: user.firstName,
         lastName: user.lastName,
@@ -91,7 +89,7 @@ export class BookingService {
         status: BOOKING_STATUSES.CONFIRMED,
       }).save();
 
-      await this.eventService.updateTicket(booking.eventId, booking.ticketId);
+      await this._eventService.updateTicket(booking.eventId, booking.ticketId);
 
       return booking;
     } catch (error) {
@@ -108,7 +106,7 @@ export class BookingService {
     ticketId?: string,
   ): Promise<IBooking[]> {
     try {
-      const event = await this.eventService.findOne(eventId);
+      const event = await this._eventService.findOne(eventId);
 
       if (!event) {
         throw new HttpException(
@@ -125,7 +123,7 @@ export class BookingService {
         id.ticketId = ticketId;
       }
 
-      const bookings = await this.BookingModel.find(id);
+      const bookings = await this._bookingModel.find(id);
 
       return bookings;
     } catch (error) {
@@ -144,9 +142,11 @@ export class BookingService {
     cancellationReason: string,
   ): Promise<IBooking> {
     try {
-      const existingBooking = await this.BookingModel.findOne({
-        _id: bookingId,
-      }).lean();
+      const existingBooking = await this._bookingModel
+        .findOne({
+          _id: bookingId,
+        })
+        .lean();
 
       if (
         !existingBooking ||
@@ -165,7 +165,7 @@ export class BookingService {
         cancellationReason,
       };
 
-      const cancelledBooking = await this.BookingModel.findOneAndUpdate(
+      const cancelledBooking = await this._bookingModel.findOneAndUpdate(
         {
           _id: bookingId,
         },
@@ -189,7 +189,7 @@ export class BookingService {
     input: BookingInput,
   ): Promise<[IBooking]> {
     try {
-      const existingEvent = await this.eventService.findOne(eventId);
+      const existingEvent = await this._eventService.findOne(eventId);
       if (!existingEvent) {
         throw new HttpException(
           EVENT_ERRORS.EVENT_NOT_FOUND,
@@ -198,7 +198,6 @@ export class BookingService {
       }
 
       const ticketFound = existingEvent.tickets?.find(
-        // eslint-disable-next-line no-underscore-dangle
         ticket => `${ticket._id}` === ticketId,
       );
 
@@ -216,14 +215,14 @@ export class BookingService {
       if (ticketId) {
         id.ticketId = ticketId;
       }
-      const cancelBookings = await this.BookingModel.updateMany(id, {
+      const cancelBookings = await this._bookingModel.updateMany(id, {
         $set: {
           status: BOOKING_STATUSES.CANCELLED,
           cancellationReason: input.cancellationReason,
         },
       });
 
-      const modifiedBookings = await this.BookingModel.find(id);
+      await this._bookingModel.find(id);
 
       return cancelBookings;
     } catch (error) {

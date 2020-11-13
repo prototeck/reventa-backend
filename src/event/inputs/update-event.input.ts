@@ -2,10 +2,10 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-import { Ticket } from '../interfaces/ticket.interface';
+// import { Ticket } from '../interfaces/ticket.interface';
 
 import { LocationInput } from './location.input';
-import { CreateTicketInput } from './create-ticket.input';
+// import { CreateTicketInput } from './create-ticket.input';
 
 /**
  * defines the input schema for event updation

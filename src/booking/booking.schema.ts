@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-import { LocationSchema, AddressSchema } from '../event/event.schema';
+import { LOCATION_SCHEMA, ADDRESS_SCHEMA } from '../event/event.schema';
 
 export const BOOKING_STATUSES = Object.freeze({
   CANCELLED: 'Cancelled',
@@ -8,7 +8,7 @@ export const BOOKING_STATUSES = Object.freeze({
   CONFIRMED: 'Confirmed',
 });
 
-export const BookingSchema = new mongoose.Schema(
+export const BOOKING_SCHEMA = new mongoose.Schema(
   {
     eventId: {
       type: String,
@@ -41,11 +41,11 @@ export const BookingSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-      type: LocationSchema,
+      type: LOCATION_SCHEMA,
       required: true,
     },
     address: {
-      type: AddressSchema,
+      type: ADDRESS_SCHEMA,
     },
     ticketName: {
       type: String,

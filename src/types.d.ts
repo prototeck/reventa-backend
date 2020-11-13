@@ -1,6 +1,6 @@
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
-export interface Config {
+export interface IConfig {
   mongo: {
     uri: string;
     dbname: string;

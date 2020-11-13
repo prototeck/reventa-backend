@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface ITicket {
+export interface ITicketLean {
   readonly _id: string;
   readonly name: string;
   readonly type: string;
@@ -12,6 +12,6 @@ export interface ITicket {
   readonly endsOn: number;
 }
 
-export interface Ticket extends ITicket, Document {
+export interface ITicket extends ITicketLean, Document {
   _id: string;
 }

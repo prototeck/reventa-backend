@@ -1,6 +1,6 @@
 import { Document } from 'mongoose';
 
-export interface IUser {
+export interface IUserLean {
   _id: string;
   firstName: string;
   lastName: string;
@@ -8,11 +8,11 @@ export interface IUser {
   createdOn: number;
 }
 
-export interface User extends IUser, Document {
+export interface IUser extends IUserLean, Document {
   _id: string;
 }
 
-export interface AuthInfo {
+export interface IAuthInfo {
   idToken: string;
   accessToken: string;
   refreshToken: string;

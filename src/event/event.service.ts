@@ -5,8 +5,8 @@ import { Model } from 'mongoose';
 import { makeError, prepareSubdocumentUpdate } from '../utils';
 import { Mutable } from '../types';
 
-import { Event, IEvent } from './interfaces/event.interface';
-import { Ticket, ITicket } from './interfaces/ticket.interface';
+import { IEvent, IEventLean } from './interfaces/event.interface';
+import { ITicket } from './interfaces/ticket.interface';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 import { CreateTicketInput } from './inputs/create-ticket.input';
@@ -26,14 +26,14 @@ const TICKET_ERRORS = {
 @Injectable()
 export class EventService {
   constructor(
-    @InjectModel('Event') private EventModel: Model<Event>,
-    @InjectModel('Ticket') private TicketModel: Model<Ticket>,
+    @InjectModel('Event') private _eventModel: Model<IEvent>,
+    @InjectModel('Ticket') private _ticketModel: Model<ITicket>,
   ) {}
 
   /**
    *
    */
-  async findAll(): Promise<IEvent[]> {
+  async findAll(): Promise<IEventLean[]> {
     try {
       // {
       //   location: {
@@ -46,7 +46,7 @@ export class EventService {
       //     },
       //   },
       // }
-      const events = await this.EventModel.find({}).lean();
+      const events = await this._eventModel.find({}).lean();
 
       return events;
     } catch (error) {
@@ -54,11 +54,13 @@ export class EventService {
     }
   }
 
-  async findOne(id: string): Promise<IEvent> {
+  async findOne(id: string): Promise<IEventLean> {
     try {
-      const event = await this.EventModel.findOne({
-        _id: id,
-      }).lean();
+      const event = await this._eventModel
+        .findOne({
+          _id: id,
+        })
+        .lean();
 
       if (!event) {
         throw new HttpException(
@@ -82,7 +84,7 @@ export class EventService {
    */
   async createEvent(userId: string, input: CreateEventInput) {
     try {
-      const event = await new this.EventModel({
+      const event = await new this._eventModel({
         ...input,
         createdBy: userId,
         location: {
@@ -108,9 +110,9 @@ export class EventService {
   async updateEvent(
     id: string,
     updateInput: UpdateEventInput,
-  ): Promise<IEvent> {
+  ): Promise<IEventLean> {
     try {
-      const existingEvent = await this.EventModel.findOne({ _id: id }).lean();
+      const existingEvent = await this._eventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {
         throw new HttpException(
@@ -121,7 +123,7 @@ export class EventService {
 
       const { location, ...updateWithoutLocation } = updateInput;
 
-      const updateDocument: Partial<Mutable<IEvent>> = {
+      const updateDocument: Partial<Mutable<IEventLean>> = {
         ...updateWithoutLocation,
       };
 
@@ -132,7 +134,7 @@ export class EventService {
         };
       }
 
-      const updatedEvent = await this.EventModel.findOneAndUpdate(
+      const updatedEvent = await this._eventModel.findOneAndUpdate(
         {
           _id: id,
         },
@@ -157,9 +159,9 @@ export class EventService {
    *
    * @public
    */
-  async deleteEvent(id: string): Promise<IEvent> {
+  async deleteEvent(id: string): Promise<IEventLean> {
     try {
-      const existingEvent = await this.EventModel.findOne({ _id: id }).lean();
+      const existingEvent = await this._eventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {
         throw new HttpException(
@@ -168,9 +170,11 @@ export class EventService {
         );
       }
 
-      const deletedEvent = await this.EventModel.findOneAndDelete({
-        _id: id,
-      });
+      const deletedEvent = await this._eventModel
+        .findOneAndDelete({
+          _id: id,
+        })
+        .lean();
 
       return deletedEvent;
     } catch (error) {
@@ -183,7 +187,7 @@ export class EventService {
     ticketInput: CreateTicketInput,
   ): Promise<ITicket> {
     try {
-      const event = await this.EventModel.findOne({ _id: eventId });
+      const event = await this._eventModel.findOne({ _id: eventId });
 
       if (!event) {
         throw new HttpException(
@@ -192,7 +196,7 @@ export class EventService {
         );
       }
 
-      const ticket = new this.TicketModel({ ...ticketInput });
+      const ticket = new this._ticketModel({ ...ticketInput });
 
       event.tickets.push(ticket);
 
@@ -210,7 +214,7 @@ export class EventService {
     ticketInput: UpdateTicketInput,
   ) {
     try {
-      const eventWithTicket = await this.EventModel.findOne({
+      const eventWithTicket = await this._eventModel.findOne({
         _id: eventId,
         'tickets._id': ticketId,
       });
@@ -222,9 +226,7 @@ export class EventService {
         );
       }
 
-      // eslint-disable-next-line no-underscore-dangle
       const ticketFound = eventWithTicket.tickets.find(
-        // eslint-disable-next-line no-underscore-dangle
         ticket => `${ticket._id}` === ticketId,
       );
 
@@ -274,7 +276,7 @@ export class EventService {
         'tickets',
       );
 
-      await this.EventModel.updateOne(
+      await this._eventModel.updateOne(
         {
           _id: eventId,
           'tickets._id': ticketId,
@@ -299,7 +301,7 @@ export class EventService {
 
   async updateTicket(eventId: string, ticketId: string): Promise<ITicket> {
     try {
-      const eventWithTicket = await this.EventModel.findOne({
+      const eventWithTicket = await this._eventModel.findOne({
         _id: eventId,
         'tickets._id': ticketId,
       });
@@ -311,7 +313,7 @@ export class EventService {
         );
       }
 
-      const updatedTicket = await this.EventModel.updateOne(
+      const updatedTicket = await this._eventModel.updateOne(
         {
           _id: eventId,
           'tickets._id': ticketId,
@@ -320,6 +322,7 @@ export class EventService {
           $inc: { 'tickets.$.sold': 1, 'tickets.$.quantity': -1 },
         },
       );
+
       return updatedTicket;
     } catch (error) {
       throw makeError(error);

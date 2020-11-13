@@ -2,20 +2,20 @@ import { Injectable } from '@nestjs/common';
 import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 import * as AWS from 'aws-sdk';
 
-import { IUser, AuthInfo } from '../user/interfaces/user.interface';
+import { IUserLean, IAuthInfo } from '../user/interfaces/user.interface';
 
 export type CognitoUserAttribute = AmazonCognitoIdentity.CognitoUserAttribute;
 
 @Injectable()
 export class AuthenticationService {
-  private poolData;
+  private _poolData;
 
-  private userPool;
+  private _userPool;
 
-  private cognitoAdmin;
+  private _cognitoAdmin;
 
   constructor() {
-    this.poolData = {
+    this._poolData = {
       UserPoolId: global.config.aws.cognito.poolId,
       ClientId: global.config.aws.cognito.clientId,
     };
@@ -33,27 +33,30 @@ export class AuthenticationService {
       };
     }
 
-    this.userPool = new AmazonCognitoIdentity.CognitoUserPool(this.poolData);
+    this._userPool = new AmazonCognitoIdentity.CognitoUserPool(this._poolData);
 
-    this.cognitoAdmin = new AWS.CognitoIdentityServiceProvider({
+    this._cognitoAdmin = new AWS.CognitoIdentityServiceProvider({
       region: global.config.aws.cognito.poolRegion,
       ...configKeys,
     });
   }
 
-  private makeAttribute = (name: string, value: string): CognitoUserAttribute =>
+  private _makeAttribute = (
+    name: string,
+    value: string,
+  ): CognitoUserAttribute =>
     new AmazonCognitoIdentity.CognitoUserAttribute({
       Name: name,
       Value: value,
     });
 
-  private signUp(
+  private _signUp(
     userId: string,
     password: string,
     attributeList: CognitoUserAttribute[],
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.userPool.signUp(userId, password, attributeList, null, error => {
+      this._userPool.signUp(userId, password, attributeList, null, error => {
         if (error) {
           return reject(error);
         }
@@ -63,7 +66,7 @@ export class AuthenticationService {
     });
   }
 
-  private signIn(userId: string, password: string): Promise<AuthInfo> {
+  private _signIn(userId: string, password: string): Promise<IAuthInfo> {
     return new Promise((resolve, reject) => {
       const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
         {
@@ -74,7 +77,7 @@ export class AuthenticationService {
 
       const userData = {
         Username: userId,
-        Pool: this.userPool,
+        Pool: this._userPool,
       };
 
       const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
@@ -96,11 +99,11 @@ export class AuthenticationService {
     });
   }
 
-  private confirmRegistration(userId: string, code: string): Promise<string> {
+  private _confirmRegistration(userId: string, code: string): Promise<string> {
     return new Promise((resolve, reject) => {
       const userData = {
         Username: userId,
-        Pool: this.userPool,
+        Pool: this._userPool,
       };
 
       const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
@@ -115,33 +118,30 @@ export class AuthenticationService {
     });
   }
 
-  public userSignup(user: IUser, password: string) {
+  public userSignup(user: IUserLean, password: string) {
     return new Promise((resolve, reject) => {
       const attributeList: CognitoUserAttribute[] = [];
 
       const name = `${user.firstName} ${user.lastName}`;
 
-      attributeList.push(this.makeAttribute('email', user.email));
-      attributeList.push(this.makeAttribute('name', name));
+      attributeList.push(this._makeAttribute('email', user.email));
+      attributeList.push(this._makeAttribute('name', name));
 
-      // eslint-disable-next-line no-underscore-dangle
-      this.signUp(user._id, password, attributeList)
+      this._signUp(user._id, password, attributeList)
         .then(resolve)
         .catch(reject);
     });
   }
 
-  public userSignin(user: IUser, password: string): Promise<AuthInfo> {
+  public userSignin(user: IUserLean, password: string): Promise<IAuthInfo> {
     return new Promise((resolve, reject) => {
-      // eslint-disable-next-line no-underscore-dangle
-      this.signIn(user._id, password)
+      this._signIn(user._id, password)
         .then(resolve)
         .catch(reject);
     });
   }
 
-  public confirmCode(user: IUser, code: string) {
-    // eslint-disable-next-line no-underscore-dangle
-    return this.confirmRegistration(user._id, code);
+  public confirmCode(user: IUserLean, code: string) {
+    return this._confirmRegistration(user._id, code);
   }
 }

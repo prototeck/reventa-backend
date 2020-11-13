@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-export const LocationSchema = new mongoose.Schema(
+export const LOCATION_SCHEMA = new mongoose.Schema(
   {
     // 'location type' schema
     type: {
@@ -18,7 +18,7 @@ export const LocationSchema = new mongoose.Schema(
   },
 );
 
-export const AddressSchema = new mongoose.Schema(
+export const ADDRESS_SCHEMA = new mongoose.Schema(
   {
     addressLine1: {
       type: String,
@@ -49,7 +49,7 @@ export const AddressSchema = new mongoose.Schema(
   },
 );
 
-export const TicketSchema = new mongoose.Schema({
+export const TICKET_SCHEMA = new mongoose.Schema({
   name: {
     type: String,
     required: true,
@@ -85,7 +85,7 @@ export const TicketSchema = new mongoose.Schema({
   },
 });
 
-export const EventSchema = new mongoose.Schema(
+export const EVENT_SCHEMA = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -103,11 +103,11 @@ export const EventSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-      type: LocationSchema,
+      type: LOCATION_SCHEMA,
       required: true,
     },
     address: {
-      type: AddressSchema,
+      type: ADDRESS_SCHEMA,
     },
     category: {
       type: String,
@@ -125,7 +125,7 @@ export const EventSchema = new mongoose.Schema(
       default: [],
     },
     tickets: {
-      type: [TicketSchema],
+      type: [TICKET_SCHEMA],
     },
     createdOn: {
       type: Number,
@@ -145,4 +145,4 @@ export const EventSchema = new mongoose.Schema(
   },
 );
 
-EventSchema.index({ location: '2dsphere' });
+EVENT_SCHEMA.index({ location: '2dsphere' });

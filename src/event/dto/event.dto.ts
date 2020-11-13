@@ -1,7 +1,7 @@
 import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
 
-import { Location, Address } from '../interfaces/event.interface';
-import { Ticket } from '../interfaces/ticket.interface';
+import { ILocation, IAddress } from '../interfaces/event.interface';
+import { ITicket } from '../interfaces/ticket.interface';
 
 import { LocationDTO } from './location.dto';
 import { AddressDTO } from './address.dto';
@@ -28,10 +28,10 @@ export class EventDTO {
   readonly endsOn: number;
 
   @Field(() => LocationDTO)
-  readonly location: Location;
+  readonly location: ILocation;
 
   @Field(() => AddressDTO, { nullable: true })
-  readonly address?: Address;
+  readonly address?: IAddress;
 
   @Field()
   readonly category: string;
@@ -46,7 +46,7 @@ export class EventDTO {
   readonly secondaryImageUrls?: string[];
 
   @Field(() => [TicketDTO], { nullable: true })
-  readonly tickets?: Ticket[];
+  readonly tickets?: ITicket[];
 
   @Field(() => Float, { nullable: true })
   readonly createdOn: number;
