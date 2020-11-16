@@ -9,9 +9,9 @@ export class LoginUserInput {
   /** user's email address - a valid email address */
   @Field()
   @IsEmail()
-  readonly email: string;
+  readonly email!: string;
 
   /** user's password  */
   @Field()
-  readonly password: string;
+  readonly password!: string;
 }

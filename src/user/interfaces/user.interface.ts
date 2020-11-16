@@ -8,6 +8,7 @@ export interface IUserLean {
   createdOn: number;
 }
 
+/** User Mongo Document */
 export interface IUser extends IUserLean, Document {
   _id: string;
 }

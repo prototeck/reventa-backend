@@ -5,11 +5,11 @@ import { ObjectType, Field } from '@nestjs/graphql';
 })
 export class AuthInfoDTO {
   @Field()
-  readonly idToken: string;
+  readonly idToken!: string;
 
   @Field()
-  readonly accessToken: string;
+  readonly accessToken!: string;
 
   @Field()
-  readonly refreshToken: string;
+  readonly refreshToken!: string;
 }

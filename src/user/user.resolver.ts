@@ -51,7 +51,7 @@ export class UserResolver {
   }
 
   @Query(() => AuthInfoDTO)
-  async signinUser(@Args('input') input: LoginUserInput) {
+  async loginUser(@Args('input') input: LoginUserInput) {
     const result = await this._userService.loginUser(input);
 
     return result;

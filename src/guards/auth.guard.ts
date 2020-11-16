@@ -3,8 +3,6 @@ import {
   CanActivate,
   ExecutionContext,
   Inject,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import {
@@ -30,7 +28,7 @@ export class AuthGuard implements CanActivate {
     const { idtoken, accesstoken, refreshtoken } = headers;
 
     if (idtoken && accesstoken && refreshtoken) {
-      const decoded = jwt(idtoken);
+      const decoded: any = jwt(idtoken);
       const username = decoded['cognito:username'];
 
       const idToken = new CognitoIdToken({
@@ -55,10 +53,6 @@ export class AuthGuard implements CanActivate {
 
       if (session.isValid()) {
         const user = await this._userService.findOne(username);
-
-        if (!user) {
-          throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-        }
 
         request.headers.user = JSON.stringify(user);
 

@@ -22,16 +22,14 @@ module.exports = {
   },
   settings: {
     "import/resolver": {
-      node: {
-        typescript: {},
-        extensions: [".js", ".ts", ".d.ts"]
-      }
+      typescript: {} // this loads <rootdir>/tsconfig.json to eslint
     }
   },
   rules: {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
     'import/prefer-default-export': 0,
     'no-useless-constructor': 0,
     'no-underscore-dangle': 0,

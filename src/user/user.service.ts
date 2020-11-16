@@ -2,19 +2,15 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { AuthenticationService } from '../authentication/authentication.service';
-import { makeError } from '../utils';
+import { AuthenticationService } from '@/authentication/authentication.service';
+import { makeError } from '@/utils';
+import { USER_ERRORS } from '@errors/index';
 
 import { IUserLean, IUser } from './interfaces/user.interface';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
 import { ConfirmUserInput } from './inputs/confirm-user.input';
 import { LoginUserInput } from './inputs/login-user.input';
-
-const USER_ERRORS = {
-  USER_EXISTS: 'an user with the email already exists',
-  USER_NOT_FOUND: 'user does not exist',
-} as const;
 
 @Injectable()
 export class UserService {
@@ -41,6 +37,10 @@ export class UserService {
     try {
       const user = await this._userModel.findOne({ _id: id }).lean();
 
+      if (!user) {
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
+      }
+
       return user;
     } catch (error) {
       throw makeError(error);
@@ -52,7 +52,7 @@ export class UserService {
    * @param email - email id of user
    * @returns found User type record
    */
-  async findByEmail(email: string): Promise<IUserLean> {
+  async findByEmail(email: string): Promise<IUserLean | null> {
     const user = await this._userModel.findOne({ email }).lean();
 
     return user;
@@ -71,7 +71,10 @@ export class UserService {
       const existingUser = await this.findByEmail(input.email);
 
       if (existingUser) {
-        throw new HttpException(USER_ERRORS.USER_EXISTS, HttpStatus.CONFLICT);
+        throw new HttpException(
+          USER_ERRORS.ALREADY_EXISTS_WITH_EMAIL,
+          HttpStatus.CONFLICT,
+        );
       }
 
       const user = await new this._userModel({ ...input }).save();
@@ -97,10 +100,7 @@ export class UserService {
       const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const updatedUser = await this._userModel.findOneAndUpdate(
@@ -115,7 +115,7 @@ export class UserService {
         },
       );
 
-      return updatedUser;
+      return updatedUser!;
     } catch (error) {
       throw makeError(error);
     }
@@ -133,17 +133,14 @@ export class UserService {
       const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const deletedUser = await this._userModel.findOneAndDelete({
         _id: id,
       });
 
-      return deletedUser;
+      return deletedUser!;
     } catch (error) {
       throw makeError(error);
     }
@@ -159,10 +156,7 @@ export class UserService {
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const result = await this._authenticationService.confirmCode(
@@ -189,10 +183,7 @@ export class UserService {
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const result = await this._authenticationService.userSignin(

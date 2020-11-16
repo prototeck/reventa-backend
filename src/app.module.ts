@@ -8,7 +8,7 @@ import fetch from 'node-fetch';
 import configs from './config/config.json';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { IConfig } from './types.d';
+import { IConfig } from './typings';
 import { corsConfig } from './utils';
 import { UserModule } from './user/user.module';
 import { EventModule } from './event/event.module';

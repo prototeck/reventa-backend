@@ -134,7 +134,7 @@ describe('UserService', () => {
     });
 
     it('should call service.findByEmail to check existing user', async done => {
-      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+      jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
 
       await service.createUser(createInput);
 
@@ -165,7 +165,7 @@ describe('UserService', () => {
       let result: IUser;
 
       beforeEach(async () => {
-        jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+        jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
         jest
           .spyOn(UserModelMock.prototype, 'save')
           .mockResolvedValue({ _id: mongoId, ...createInput });
@@ -217,7 +217,7 @@ describe('UserService', () => {
       // just knowing that it is called is enough
 
       // this allows to mock user not found
-      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+      jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
 
       service
         .loginUser(loginInput)

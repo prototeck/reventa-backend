@@ -84,7 +84,7 @@ type Booking {
 
 type Query {
   users: [User!]!
-  signinUser(input: LoginUserInput!): AuthInfo!
+  loginUser(input: LoginUserInput!): AuthInfo!
   events: [Event!]!
   getEventById(id: String!): Event!
   getBookingByEvent(ticketId: String, eventId: String!): [Booking!]!
