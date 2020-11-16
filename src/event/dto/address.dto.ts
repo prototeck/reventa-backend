@@ -3,23 +3,23 @@ import { ObjectType, Field } from '@nestjs/graphql';
 /**
  * defines the dto schema for event address
  */
-@ObjectType()
+@ObjectType('Address')
 export class AddressDTO {
   @Field()
-  readonly addressLine1: string;
+  readonly addressLine1!: string;
 
   @Field({ nullable: true })
   readonly addressLine2?: string;
 
   @Field()
-  readonly city: string;
+  readonly city!: string;
 
   @Field()
-  readonly state: string;
+  readonly state!: string;
 
   @Field()
-  readonly zipCode: string;
+  readonly zipCode!: string;
 
   @Field()
-  readonly country: string;
+  readonly country!: string;
 }

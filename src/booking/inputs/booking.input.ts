@@ -1,10 +1,10 @@
-import { InputType, Field } from '@nestjs/graphql';
+// import { InputType, Field } from '@nestjs/graphql';
 
-/**
- * defines the input schema for booking cancellation
- */
-@InputType()
-export class BookingInput {
-  @Field()
-  readonly cancellationReason: string;
-}
+// /**
+//  * defines the input schema for booking cancellation
+//  */
+// @InputType()
+// export class BookingInput {
+//   @Field()
+//   readonly cancellationReason: string;
+// }

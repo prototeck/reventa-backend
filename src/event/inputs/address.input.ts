@@ -7,21 +7,21 @@ import { IsNumberString } from 'class-validator';
 @InputType()
 export class AddressInput {
   @Field()
-  readonly addressLine1: string;
+  readonly addressLine1!: string;
 
   @Field({ nullable: true })
   readonly addressLine2?: string;
 
   @Field()
-  readonly city: string;
+  readonly city!: string;
 
   @Field()
-  readonly state: string;
+  readonly state!: string;
 
   @Field()
   @IsNumberString()
-  readonly zipCode: string;
+  readonly zipCode!: string;
 
   @Field()
-  readonly country: string;
+  readonly country!: string;
 }

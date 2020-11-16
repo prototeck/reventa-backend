@@ -20,3 +20,4 @@ export interface IConfig {
 }
 
 export * from './user';
+export * from './event';

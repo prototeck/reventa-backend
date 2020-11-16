@@ -1,8 +1,5 @@
 import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
 
-import { ILocation, IAddress } from '../interfaces/event.interface';
-import { ITicket } from '../interfaces/ticket.interface';
-
 import { LocationDTO } from './location.dto';
 import { AddressDTO } from './address.dto';
 import { TicketDTO } from './ticket.dto';
@@ -10,34 +7,34 @@ import { TicketDTO } from './ticket.dto';
 @ObjectType('Event', { description: 'The Event Model' })
 export class EventDTO {
   @Field(() => ID)
-  readonly _id: string;
+  readonly _id!: string;
 
   @Field()
-  readonly createdBy: string;
-
-  @Field()
-  readonly title: string;
+  readonly title!: string;
 
   @Field({ nullable: true })
   readonly description?: string;
 
   @Field(() => Float)
-  readonly startsOn: number;
+  readonly startsOn!: number;
 
   @Field(() => Float)
-  readonly endsOn: number;
+  readonly endsOn!: number;
 
   @Field(() => LocationDTO)
-  readonly location: ILocation;
+  readonly location!: LocationDTO;
 
   @Field(() => AddressDTO, { nullable: true })
-  readonly address?: IAddress;
+  readonly address?: AddressDTO;
 
   @Field()
-  readonly category: string;
+  readonly category!: string;
 
   @Field(() => [String], { nullable: true })
   readonly tags?: string[];
+
+  @Field()
+  readonly createdBy!: string;
 
   @Field({ nullable: true })
   readonly mainImageUrl?: string;
@@ -46,11 +43,11 @@ export class EventDTO {
   readonly secondaryImageUrls?: string[];
 
   @Field(() => [TicketDTO], { nullable: true })
-  readonly tickets?: ITicket[];
+  readonly tickets?: TicketDTO[];
 
-  @Field(() => Float, { nullable: true })
-  readonly createdOn: number;
+  @Field(() => Float)
+  readonly createdOn!: number;
 
-  @Field(() => Float, { nullable: true })
-  readonly updatedOn: number;
+  @Field(() => Float)
+  readonly updatedOn!: number;
 }

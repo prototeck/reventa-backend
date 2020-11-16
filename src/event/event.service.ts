@@ -2,26 +2,25 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { makeError, prepareSubdocumentUpdate } from '../utils';
-import { Mutable } from '../types';
+import { makeError, prepareSubdocumentUpdate } from '@/utils';
+import {
+  Mutable,
+  IEvent,
+  IEventLean,
+  ITicket,
+  ITicketLean,
+} from '@typings/index';
+import {
+  EVENT_ERRORS,
+  TICKET_ERRORS,
+  FIELD_REQUIRED,
+  FIELD_NOT_ALLOWED,
+} from '@errors/index';
 
-import { IEvent, IEventLean } from './interfaces/event.interface';
-import { ITicket } from './interfaces/ticket.interface';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 import { CreateTicketInput } from './inputs/create-ticket.input';
 import { UpdateTicketInput } from './inputs/update-ticket.input';
-
-const EVENT_ERRORS = {
-  EVENT_NOT_FOUND: 'Event does not exist',
-} as const;
-
-const TICKET_ERRORS = {
-  TICKET_NOT_FOUND: 'Ticket does not exist',
-  FIELD_REQUIRED: (field: string) => `${field} is required`,
-  FIELD_NOT_ALLOWED: (field: string) => `${field} cannot be updated`,
-  ENDTIME_LESS_THAN_STARTTIME: 'End time cannot be less than Start time',
-} as const;
 
 @Injectable()
 export class EventService {
@@ -63,10 +62,7 @@ export class EventService {
         .lean();
 
       if (!event) {
-        throw new HttpException(
-          EVENT_ERRORS.EVENT_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(EVENT_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       return event;
@@ -115,10 +111,7 @@ export class EventService {
       const existingEvent = await this._eventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {
-        throw new HttpException(
-          EVENT_ERRORS.EVENT_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(EVENT_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const { location, ...updateWithoutLocation } = updateInput;
@@ -134,19 +127,21 @@ export class EventService {
         };
       }
 
-      const updatedEvent = await this._eventModel.findOneAndUpdate(
-        {
-          _id: id,
-        },
-        {
-          $set: { ...updateDocument, updatedOn: Date.now() },
-        },
-        {
-          new: true,
-        },
-      );
+      const updatedEvent = await this._eventModel
+        .findOneAndUpdate(
+          {
+            _id: id,
+          },
+          {
+            $set: { ...updateDocument, updatedOn: Date.now() },
+          },
+          {
+            new: true,
+          },
+        )
+        .lean();
 
-      return updatedEvent;
+      return updatedEvent!;
     } catch (error) {
       throw makeError(error);
     }
@@ -164,10 +159,7 @@ export class EventService {
       const existingEvent = await this._eventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {
-        throw new HttpException(
-          EVENT_ERRORS.EVENT_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(EVENT_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const deletedEvent = await this._eventModel
@@ -176,7 +168,7 @@ export class EventService {
         })
         .lean();
 
-      return deletedEvent;
+      return deletedEvent!;
     } catch (error) {
       throw makeError(error);
     }
@@ -190,10 +182,7 @@ export class EventService {
       const event = await this._eventModel.findOne({ _id: eventId });
 
       if (!event) {
-        throw new HttpException(
-          EVENT_ERRORS.EVENT_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(EVENT_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const ticket = new this._ticketModel({ ...ticketInput });
@@ -214,35 +203,32 @@ export class EventService {
     ticketInput: UpdateTicketInput,
   ) {
     try {
-      const eventWithTicket = await this._eventModel.findOne({
-        _id: eventId,
-        'tickets._id': ticketId,
-      });
+      const eventWithTicket = await this._eventModel
+        .findOne({
+          _id: eventId,
+          'tickets._id': ticketId,
+        })
+        .lean();
 
       if (!eventWithTicket) {
-        throw new HttpException(
-          TICKET_ERRORS.TICKET_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(TICKET_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const ticketFound = eventWithTicket.tickets.find(
         ticket => `${ticket._id}` === ticketId,
-      );
-
-      // throw new HttpException('testing', HttpStatus.NOT_FOUND);
+      )!;
 
       if (ticketFound.type === 'free') {
         if (ticketInput.currency) {
           throw new HttpException(
-            TICKET_ERRORS.FIELD_NOT_ALLOWED('Currency'),
+            FIELD_NOT_ALLOWED('Currency'),
             HttpStatus.BAD_REQUEST,
           );
         }
 
         if (ticketInput.price) {
           throw new HttpException(
-            TICKET_ERRORS.FIELD_NOT_ALLOWED('Price'),
+            FIELD_NOT_ALLOWED('Price'),
             HttpStatus.BAD_REQUEST,
           );
         }
@@ -250,14 +236,14 @@ export class EventService {
 
       if (ticketInput.startsOn && !ticketInput.endsOn) {
         throw new HttpException(
-          TICKET_ERRORS.FIELD_REQUIRED('End Time'),
+          FIELD_REQUIRED('End Time'),
           HttpStatus.BAD_REQUEST,
         );
       }
 
       if (ticketInput.endsOn && !ticketInput.startsOn) {
         throw new HttpException(
-          TICKET_ERRORS.FIELD_REQUIRED('Start Time'),
+          FIELD_REQUIRED('Start Time'),
           HttpStatus.BAD_REQUEST,
         );
       }
@@ -286,7 +272,7 @@ export class EventService {
         },
       );
 
-      return { _id: ticketId, ...ticketFound, ...ticketInput };
+      return { ...ticketFound, ...ticketInput } as ITicketLean;
     } catch (error) {
       throw makeError(error);
     }
@@ -299,7 +285,7 @@ export class EventService {
    * @returns updatedTicket
    */
 
-  async updateTicket(eventId: string, ticketId: string): Promise<ITicket> {
+  async updateTicketSold(eventId: string, ticketId: string): Promise<ITicket> {
     try {
       const eventWithTicket = await this._eventModel.findOne({
         _id: eventId,
@@ -307,10 +293,7 @@ export class EventService {
       });
 
       if (!eventWithTicket) {
-        throw new HttpException(
-          TICKET_ERRORS.TICKET_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(TICKET_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
       const updatedTicket = await this._eventModel.updateOne(

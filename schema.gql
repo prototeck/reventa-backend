@@ -23,7 +23,7 @@ type Location {
   coordinates: [Float!]!
 }
 
-type AddressDTO {
+type Address {
   addressLine1: String!
   addressLine2: String
   city: String!
@@ -32,54 +32,35 @@ type AddressDTO {
   country: String!
 }
 
-type TicketDTO {
+type Ticket {
   _id: ID!
   name: String!
   type: String!
   quantity: Int!
   sold: Int!
-  currency: String
-  price: Int
   startsOn: Float!
   endsOn: Float!
+  currency: String
+  price: Int
 }
 
 """The Event Model"""
 type Event {
   _id: ID!
-  createdBy: String!
   title: String!
   description: String
   startsOn: Float!
   endsOn: Float!
   location: Location!
-  address: AddressDTO
+  address: Address
   category: String!
   tags: [String!]
+  createdBy: String!
   mainImageUrl: String
   secondaryImageUrls: [String!]
-  tickets: [TicketDTO!]
-  createdOn: Float
-  updatedOn: Float
-}
-
-"""The Booking Model"""
-type Booking {
-  _id: ID!
-  eventId: ID!
-  ticketId: ID!
-  userId: ID!
-  firstName: String
-  lastName: String
-  email: String
-  eventTitle: String
-  location: Location!
-  address: AddressDTO
-  ticketName: String
-  startsOn: Float!
-  endsOn: Float!
-  status: String!
-  cancellationReason: String!
+  tickets: [Ticket!]
+  createdOn: Float!
+  updatedOn: Float!
 }
 
 type Query {
@@ -87,7 +68,6 @@ type Query {
   loginUser(input: LoginUserInput!): AuthInfo!
   events: [Event!]!
   getEventById(id: String!): Event!
-  getBookingByEvent(ticketId: String, eventId: String!): [Booking!]!
 }
 
 input LoginUserInput {
@@ -103,11 +83,8 @@ type Mutation {
   createEvent(input: CreateEventInput!): Event!
   updateEvent(input: UpdateEventInput!, id: String!): Event!
   deleteEvent(id: String!): Event!
-  createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): TicketDTO!
-  updateTicketForEvent(ticketInput: UpdateTicketInput!, ticketId: String!, eventId: String!): TicketDTO!
-  createBooking(ticketId: String!, eventId: String!): Booking!
-  cancelBookingById(cancellationReason: String!, bookingId: String!): Booking!
-  cancelBookings(ticketId: String, input: BookingInput!, eventId: String!): Int!
+  createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): Ticket!
+  updateTicketForEvent(ticketInput: UpdateTicketInput!, ticketId: String!, eventId: String!): Ticket!
 }
 
 input CreateUserInput {
@@ -168,10 +145,10 @@ input CreateTicketInput {
   name: String!
   type: String!
   quantity: Int!
-  currency: String
-  price: Int
   startsOn: Float!
   endsOn: Float!
+  currency: String
+  price: Int
 }
 
 input UpdateTicketInput {
@@ -180,8 +157,4 @@ input UpdateTicketInput {
   price: Int
   startsOn: Float
   endsOn: Float
-}
-
-input BookingInput {
-  cancellationReason: String!
 }
