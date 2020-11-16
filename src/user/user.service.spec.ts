@@ -4,13 +4,17 @@ import { getModelToken } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Types } from 'mongoose';
 
-import { AuthenticationService } from '../authentication/authentication.service';
+import { AuthenticationService } from '@/authentication/authentication.service';
+import {
+  IUser,
+  IUserLean,
+  IAuthInfo,
+  ICreateUserInput,
+  ILoginUserInput,
+  IUpdateUserInput,
+} from '@typings/index';
 
 import { UserService } from './user.service';
-import { CreateUserInput } from './inputs/create-user.input';
-import { UpdateUserInput } from './inputs/update-user.input';
-import { IUser, IUserLean, IAuthInfo } from './interfaces/user.interface';
-import { LoginUserInput } from './inputs/login-user.input';
 
 class UserModelMock {
   data: any;
@@ -122,7 +126,7 @@ describe('UserService', () => {
   });
 
   describe('create user function', () => {
-    const createInput: CreateUserInput = {
+    const createInput: ICreateUserInput = {
       firstName: 'Aditya',
       lastName: 'Loshali',
       email: 'aditya.loshali@gmail.com',
@@ -190,7 +194,7 @@ describe('UserService', () => {
 
   describe('sign in user function', () => {
     // input test data
-    const loginInput: LoginUserInput = {
+    const loginInput: ILoginUserInput = {
       email: 'aditya.loshali@gmail.com',
       password: 'Password@1',
     };
@@ -277,7 +281,7 @@ describe('UserService', () => {
     const mongoId = Types.ObjectId().toHexString();
     let mockedLean: jest.Mock<any>;
 
-    const updateInput: UpdateUserInput = {
+    const updateInput: IUpdateUserInput = {
       firstName: 'aditya',
       lastName: 'loshali',
     };

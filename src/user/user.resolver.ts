@@ -2,9 +2,9 @@ import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 
 import { UserDTO } from './dto/user.dto';
 import { AuthInfoDTO } from './dto/authinfo.dto';
+import { UserService } from './user.service';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
-import { UserService } from './user.service';
 import { ConfirmUserInput } from './inputs/confirm-user.input';
 import { LoginUserInput } from './inputs/login-user.input';
 

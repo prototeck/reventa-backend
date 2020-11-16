@@ -13,7 +13,7 @@ import {
 } from 'amazon-cognito-identity-js';
 import jwt from 'jwt-decode';
 
-import { UserService } from '../user/user.service';
+import { UserService } from '@/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {

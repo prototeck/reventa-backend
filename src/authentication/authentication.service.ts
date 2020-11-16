@@ -2,17 +2,17 @@ import { Injectable } from '@nestjs/common';
 import * as AmazonCognitoIdentity from 'amazon-cognito-identity-js';
 import * as AWS from 'aws-sdk';
 
-import { IUserLean, IAuthInfo } from '../user/interfaces/user.interface';
+import { IUserLean, IAuthInfo } from '@typings/index';
 
 export type CognitoUserAttribute = AmazonCognitoIdentity.CognitoUserAttribute;
 
 @Injectable()
 export class AuthenticationService {
-  private _poolData;
+  private _poolData: AmazonCognitoIdentity.ICognitoUserPoolData;
 
-  private _userPool;
+  private _userPool: AmazonCognitoIdentity.CognitoUserPool;
 
-  private _cognitoAdmin;
+  private _cognitoAdmin: AWS.CognitoIdentityServiceProvider;
 
   constructor() {
     this._poolData = {
@@ -56,7 +56,7 @@ export class AuthenticationService {
     attributeList: CognitoUserAttribute[],
   ): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this._userPool.signUp(userId, password, attributeList, null, error => {
+      this._userPool.signUp(userId, password, attributeList, [], error => {
         if (error) {
           return reject(error);
         }

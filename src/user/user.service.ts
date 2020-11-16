@@ -5,12 +5,14 @@ import { Model } from 'mongoose';
 import { AuthenticationService } from '@/authentication/authentication.service';
 import { makeError } from '@/utils';
 import { USER_ERRORS } from '@errors/index';
-
-import { IUserLean, IUser } from './interfaces/user.interface';
-import { CreateUserInput } from './inputs/create-user.input';
-import { UpdateUserInput } from './inputs/update-user.input';
-import { ConfirmUserInput } from './inputs/confirm-user.input';
-import { LoginUserInput } from './inputs/login-user.input';
+import {
+  IUserLean,
+  IUser,
+  ICreateUserInput,
+  IConfirmUserInput,
+  ILoginUserInput,
+  IUpdateUserInput,
+} from '@typings/index';
 
 @Injectable()
 export class UserService {
@@ -33,6 +35,11 @@ export class UserService {
     }
   }
 
+  /**
+   * * find the user in database by unique id
+   * @param id - database unique id of user
+   * @returns found User type record
+   */
   async findOne(id: string): Promise<IUserLean> {
     try {
       const user = await this._userModel.findOne({ _id: id }).lean();
@@ -66,7 +73,7 @@ export class UserService {
    *
    * @public
    */
-  async createUser(input: CreateUserInput) {
+  async createUser(input: ICreateUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
 
@@ -95,7 +102,7 @@ export class UserService {
    *
    * @public
    */
-  async updateUser(id: string, updateInput: UpdateUserInput): Promise<IUser> {
+  async updateUser(id: string, updateInput: IUpdateUserInput): Promise<IUser> {
     try {
       const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
@@ -151,7 +158,7 @@ export class UserService {
    * @param input - confirm user input including the verification code
    * @returns success message string
    */
-  async confirmUser(input: ConfirmUserInput) {
+  async confirmUser(input: IConfirmUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
 
@@ -178,7 +185,7 @@ export class UserService {
    * @public
    */
 
-  async loginUser(input: LoginUserInput) {
+  async loginUser(input: ILoginUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
 

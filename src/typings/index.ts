@@ -18,3 +18,5 @@ export interface IConfig {
     };
   };
 }
+
+export * from './user';
