@@ -51,19 +51,19 @@ export const pubsub = new PubSub();
       installSubscriptionHandlers: true,
       autoSchemaFile: 'schema.gql',
       cors: { ...corsConfig },
-      formatError: error => {
-        if (
-          typeof error.extensions?.exception.response !== 'string' &&
-          error.extensions?.exception.response.message
-        ) {
-          return {
-            status: error.extensions.exception.response.statusCode,
-            message: error.extensions.exception.response.message[0],
-          };
-        }
+      // formatError: error => {
+      //   if (
+      //     typeof error.extensions?.exception.response !== 'string' &&
+      //     error.extensions?.exception.response.message
+      //   ) {
+      //     return {
+      //       status: error.extensions.exception.response.statusCode,
+      //       message: error.extensions.exception.response.message[0],
+      //     };
+      //   }
 
-        return error;
-      },
+      //   return error;
+      // },
       context: async ({
         req: request,
         res: response,

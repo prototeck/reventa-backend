@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { makeError, prepareSubdocumentUpdate } from '@/utils';
+import { joiValidate, makeError, prepareSubdocumentUpdate } from '@/utils';
 import {
   Mutable,
   IEvent,
@@ -80,6 +80,10 @@ export class EventService {
    */
   async createEvent(userId: string, input: CreateEventInput) {
     try {
+      // joiValidate<CreateEventInput>({
+      //   title: s
+      // }, input);
+
       const event = await new this._eventModel({
         ...input,
         createdBy: userId,

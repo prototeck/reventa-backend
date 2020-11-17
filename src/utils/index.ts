@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
+import { object, SchemaMap } from 'joi';
 
 export const makeError = (error: any): HttpException => {
   if (error instanceof HttpException) {
@@ -26,3 +27,17 @@ export function prepareSubdocumentUpdate(input, basePath: string) {
 
   return subdocumentUpdate;
 }
+
+export const joiValidate = <T>(schema: SchemaMap<T>) => {
+  const objectSchema = object<T>(schema);
+
+  return (value: any) => {
+    const response = objectSchema.validate(value);
+
+    if (response.error) {
+      throw new HttpException(response.error.message, HttpStatus.BAD_REQUEST);
+    }
+
+    return response;
+  };
+};
