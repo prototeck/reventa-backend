@@ -1,6 +1,4 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
-import { IsOptional, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
 
 // import { Ticket } from '../interfaces/ticket.interface';
 
