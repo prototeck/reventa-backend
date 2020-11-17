@@ -1,8 +1,9 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 
-import { User as UserType } from '../user/interfaces/user.interface';
+import { IUserLean as UserType } from '@typings/index';
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
 export const User = createParamDecorator(
   (data: unknown, context: ExecutionContext) => {
     const ctx = GqlExecutionContext.create(context).getContext();

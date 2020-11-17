@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 
-const LocationSchema = new mongoose.Schema(
+export const LOCATION_SCHEMA = new mongoose.Schema(
   {
     // 'location type' schema
     type: {
@@ -18,7 +18,74 @@ const LocationSchema = new mongoose.Schema(
   },
 );
 
-export const EventSchema = new mongoose.Schema(
+export const ADDRESS_SCHEMA = new mongoose.Schema(
+  {
+    addressLine1: {
+      type: String,
+      required: true,
+    },
+    addressLine2: {
+      type: String,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    state: {
+      type: String,
+      required: true,
+    },
+    zipCode: {
+      type: String,
+      required: true,
+    },
+    country: {
+      type: String,
+      required: true,
+    },
+  },
+  {
+    _id: false,
+  },
+);
+
+export const TICKET_SCHEMA = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    minlength: 2,
+    maxlength: 50,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  sold: {
+    type: Number,
+    default: 0,
+  },
+  type: {
+    type: String,
+    enum: ['free', 'paid'],
+    required: true,
+  },
+  currency: {
+    type: String,
+  },
+  price: {
+    type: Number,
+  },
+  startsOn: {
+    type: Number,
+    required: true,
+  },
+  endsOn: {
+    type: Number,
+    required: true,
+  },
+});
+
+export const EVENT_SCHEMA = new mongoose.Schema(
   {
     title: {
       type: String,
@@ -26,7 +93,6 @@ export const EventSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: true,
     },
     startsOn: {
       type: Number,
@@ -37,8 +103,11 @@ export const EventSchema = new mongoose.Schema(
       required: true,
     },
     location: {
-      type: LocationSchema,
+      type: LOCATION_SCHEMA,
       required: true,
+    },
+    address: {
+      type: ADDRESS_SCHEMA,
     },
     category: {
       type: String,
@@ -46,7 +115,17 @@ export const EventSchema = new mongoose.Schema(
     },
     tags: {
       type: [String],
-      required: true,
+      default: [],
+    },
+    mainImageUrl: {
+      type: String,
+    },
+    secondaryImageUrls: {
+      type: [String],
+      default: [],
+    },
+    tickets: {
+      type: [TICKET_SCHEMA],
     },
     createdOn: {
       type: Number,
@@ -66,4 +145,4 @@ export const EventSchema = new mongoose.Schema(
   },
 );
 
-EventSchema.index({ location: '2dsphere' });
+EVENT_SCHEMA.index({ location: '2dsphere' });

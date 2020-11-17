@@ -8,22 +8,24 @@ import fetch from 'node-fetch';
 import configs from './config/config.json';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { Config } from './types.d';
+import { IConfig } from './typings';
 import { corsConfig } from './utils';
 import { UserModule } from './user/user.module';
 import { EventModule } from './event/event.module';
+// import { BookingModule } from './booking/booking.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 
 const environment = process.env.NODE_ENV || 'development';
 
-const config: Config = configs[environment];
+const config: IConfig = configs[environment];
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace NodeJS {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
     interface Global {
       fetch: typeof fetch;
-      config: Config;
+      config: IConfig;
     }
   }
 }
@@ -69,6 +71,7 @@ export const pubsub = new PubSub();
     UserModule,
     AuthenticationModule,
     EventModule,
+    // BookingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -23,25 +23,51 @@ type Location {
   coordinates: [Float!]!
 }
 
+type Address {
+  addressLine1: String!
+  addressLine2: String
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String!
+}
+
+type Ticket {
+  _id: ID!
+  name: String!
+  type: String!
+  quantity: Int!
+  sold: Int!
+  startsOn: Float!
+  endsOn: Float!
+  currency: String
+  price: Int
+}
+
 """The Event Model"""
 type Event {
   _id: ID!
-  createdBy: String!
   title: String!
-  description: String!
+  description: String
   startsOn: Float!
   endsOn: Float!
   location: Location!
+  address: Address
   category: String!
-  tags: [String!]!
+  tags: [String!]
+  createdBy: String!
+  mainImageUrl: String
+  secondaryImageUrls: [String!]
+  tickets: [Ticket!]
   createdOn: Float!
   updatedOn: Float!
 }
 
 type Query {
   users: [User!]!
-  signinUser(input: LoginUserInput!): AuthInfo!
+  loginUser(input: LoginUserInput!): AuthInfo!
   events: [Event!]!
+  getEventById(id: String!): Event!
 }
 
 input LoginUserInput {
@@ -57,6 +83,8 @@ type Mutation {
   createEvent(input: CreateEventInput!): Event!
   updateEvent(input: UpdateEventInput!, id: String!): Event!
   deleteEvent(id: String!): Event!
+  createTicketForEvent(ticketInput: CreateTicketInput!, eventId: String!): Ticket!
+  updateTicketForEvent(ticketInput: UpdateTicketInput!, ticketId: String!, eventId: String!): Ticket!
 }
 
 input CreateUserInput {
@@ -78,17 +106,27 @@ input ConfirmUserInput {
 
 input CreateEventInput {
   title: String!
-  description: String!
+  description: String
   startsOn: Float!
   endsOn: Float!
   location: LocationInput!
+  address: AddressInput
   category: String!
-  tags: [String!]!
+  tags: [String!]
 }
 
 input LocationInput {
   latitude: Float!
   longitude: Float!
+}
+
+input AddressInput {
+  addressLine1: String!
+  addressLine2: String
+  city: String!
+  state: String!
+  zipCode: String!
+  country: String!
 }
 
 input UpdateEventInput {
@@ -98,5 +136,25 @@ input UpdateEventInput {
   endsOn: Float
   location: LocationInput
   category: String
+  mainImageUrl: String
+  secondaryImageUrls: [String!]
   tags: [String!]
+}
+
+input CreateTicketInput {
+  name: String!
+  type: String!
+  quantity: Int!
+  startsOn: Float!
+  endsOn: Float!
+  currency: String
+  price: Int
+}
+
+input UpdateTicketInput {
+  quantity: Int
+  currency: String
+  price: Int
+  startsOn: Float
+  endsOn: Float
 }

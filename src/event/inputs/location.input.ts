@@ -9,10 +9,10 @@ export class LocationInput {
   /** location's latitude of type number */
   @Field(() => Float)
   @IsLatitude()
-  readonly latitude: number;
+  readonly latitude!: number;
 
   /** location's longitude of type number */
   @Field(() => Float)
   @IsLongitude()
-  readonly longitude: number;
+  readonly longitude!: number;
 }

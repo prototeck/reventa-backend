@@ -4,17 +4,17 @@ import { ObjectType, Field, ID, Float } from '@nestjs/graphql';
 export class UserDTO {
   @Field(() => ID)
   // tslint:disable-next-line: variable-name
-  readonly _id: string;
+  readonly _id!: string;
 
   @Field()
-  readonly firstName: string;
+  readonly firstName!: string;
 
   @Field()
-  readonly lastName: string;
+  readonly lastName!: string;
 
   @Field()
-  readonly email: string;
+  readonly email!: string;
 
   @Field(() => Float)
-  readonly createdOn: string;
+  readonly createdOn!: string;
 }

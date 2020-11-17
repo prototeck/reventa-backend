@@ -1,17 +1,20 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Types } from 'mongoose';
 
-import { AuthenticationService } from '../authentication/authentication.service';
+import { AuthenticationService } from '@/authentication/authentication.service';
+import {
+  IUser,
+  IUserLean,
+  IAuthInfo,
+  ICreateUserInput,
+  ILoginUserInput,
+  IUpdateUserInput,
+} from '@typings/index';
 
 import { UserService } from './user.service';
-import { CreateUserInput } from './inputs/create-user.input';
-import { UpdateUserInput } from './inputs/update-user.input';
-import { IUser, AuthInfo } from './interfaces/user.interface';
-import { LoginUserInput } from './inputs/login-user.input';
 
 class UserModelMock {
   data: any;
@@ -69,7 +72,7 @@ describe('UserService', () => {
   });
 
   describe('find all function', () => {
-    let result: IUser[];
+    let result: IUserLean[];
     let mockedLean: jest.Mock<any[]>;
 
     beforeEach(async () => {
@@ -123,7 +126,7 @@ describe('UserService', () => {
   });
 
   describe('create user function', () => {
-    const createInput: CreateUserInput = {
+    const createInput: ICreateUserInput = {
       firstName: 'Aditya',
       lastName: 'Loshali',
       email: 'aditya.loshali@gmail.com',
@@ -135,7 +138,7 @@ describe('UserService', () => {
     });
 
     it('should call service.findByEmail to check existing user', async done => {
-      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+      jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
 
       await service.createUser(createInput);
 
@@ -147,7 +150,7 @@ describe('UserService', () => {
     it('should throw error when an user with same email exists', async done => {
       jest
         .spyOn(service, 'findByEmail')
-        .mockImplementation(async () => (createInput as any) as IUser);
+        .mockImplementation(async () => (createInput as any) as IUserLean);
 
       service
         .createUser(createInput)
@@ -166,7 +169,7 @@ describe('UserService', () => {
       let result: IUser;
 
       beforeEach(async () => {
-        jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+        jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
         jest
           .spyOn(UserModelMock.prototype, 'save')
           .mockResolvedValue({ _id: mongoId, ...createInput });
@@ -177,7 +180,6 @@ describe('UserService', () => {
       it('should call the UserModel save method and return correct result', () => {
         expect(UserModelMock.prototype.save).toHaveBeenCalled();
         expect(result).toMatchObject(createInput);
-        // eslint-disable-next-line no-underscore-dangle
         expect(result._id).toBeDefined();
       });
 
@@ -192,13 +194,13 @@ describe('UserService', () => {
 
   describe('sign in user function', () => {
     // input test data
-    const loginInput: LoginUserInput = {
+    const loginInput: ILoginUserInput = {
       email: 'aditya.loshali@gmail.com',
       password: 'Password@1',
     };
 
     // mocked to resolve for findByEmail
-    const mockedUser: IUser = {
+    const mockedUser: IUserLean = {
       _id: Types.ObjectId().toHexString(),
       firstName: 'Aditya',
       lastName: 'Loshali',
@@ -219,7 +221,7 @@ describe('UserService', () => {
       // just knowing that it is called is enough
 
       // this allows to mock user not found
-      jest.spyOn(service, 'findByEmail').mockResolvedValue(undefined);
+      jest.spyOn(service, 'findByEmail').mockResolvedValue(null);
 
       service
         .loginUser(loginInput)
@@ -240,8 +242,8 @@ describe('UserService', () => {
     describe('when input data is correct', () => {
       // dummy tokens to return as mocked result
       // and to be used in expect
-      const tokens: AuthInfo = ({} as any) as AuthInfo;
-      let result: AuthInfo;
+      const tokens: IAuthInfo = ({} as any) as IAuthInfo;
+      let result: IAuthInfo;
 
       // mock the functions / business logic inside the login service
       // to emulate success data with no error
@@ -279,7 +281,7 @@ describe('UserService', () => {
     const mongoId = Types.ObjectId().toHexString();
     let mockedLean: jest.Mock<any>;
 
-    const updateInput: UpdateUserInput = {
+    const updateInput: IUpdateUserInput = {
       firstName: 'aditya',
       lastName: 'loshali',
     };

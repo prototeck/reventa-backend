@@ -11,5 +11,18 @@ export const makeError = (error: any): HttpException => {
 export const corsConfig = {
   origin: '*',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-  allowedHeaders: 'Content-Type, Accept',
+  allowedHeaders: 'Content-Type, Accept, idToken, accessToken, refreshToken',
+  credentials: true,
 };
+
+export function prepareSubdocumentUpdate(input, basePath: string) {
+  const subdocumentUpdate = Object.entries(input).reduce(
+    (memo, [key, value]) => ({
+      ...memo,
+      [`${basePath}${'.$.'}${key}`]: value,
+    }),
+    {},
+  );
+
+  return subdocumentUpdate;
+}

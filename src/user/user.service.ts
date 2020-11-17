@@ -2,43 +2,51 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { AuthenticationService } from '../authentication/authentication.service';
-import { makeError } from '../utils';
-
-import { User, IUser } from './interfaces/user.interface';
-import { CreateUserInput } from './inputs/create-user.input';
-import { UpdateUserInput } from './inputs/update-user.input';
-import { ConfirmUserInput } from './inputs/confirm-user.input';
-import { LoginUserInput } from './inputs/login-user.input';
-
-const USER_ERRORS = {
-  USER_EXISTS: 'an user with the email already exists',
-  USER_NOT_FOUND: 'user does not exist',
-} as const;
+import { AuthenticationService } from '@/authentication/authentication.service';
+import { makeError } from '@/utils';
+import { USER_ERRORS } from '@errors/index';
+import {
+  IUserLean,
+  IUser,
+  ICreateUserInput,
+  IConfirmUserInput,
+  ILoginUserInput,
+  IUpdateUserInput,
+} from '@typings/index';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel('User') private UserModel: Model<User>,
-    private readonly authenticationService: AuthenticationService,
+    @InjectModel('User') private _userModel: Model<IUser>,
+    private readonly _authenticationService: AuthenticationService,
   ) {}
 
   /**
    * * finds all the users in the database
    * @returns an array of all the User type records
    */
-  async findAll(): Promise<IUser[]> {
+  async findAll(): Promise<IUserLean[]> {
     try {
-      const users = await this.UserModel.find({}).lean();
+      const users = await this._userModel.find({}).lean();
+
       return users;
     } catch (error) {
       throw makeError(error);
     }
   }
 
-  async findOne(id: string): Promise<IUser> {
+  /**
+   * * find the user in database by unique id
+   * @param id - database unique id of user
+   * @returns found User type record
+   */
+  async findOne(id: string): Promise<IUserLean> {
     try {
-      const user = await this.UserModel.findOne({ _id: id }).lean();
+      const user = await this._userModel.findOne({ _id: id }).lean();
+
+      if (!user) {
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
+      }
 
       return user;
     } catch (error) {
@@ -51,8 +59,8 @@ export class UserService {
    * @param email - email id of user
    * @returns found User type record
    */
-  async findByEmail(email: string): Promise<IUser> {
-    const user = await this.UserModel.findOne({ email }).lean();
+  async findByEmail(email: string): Promise<IUserLean | null> {
+    const user = await this._userModel.findOne({ email }).lean();
 
     return user;
   }
@@ -65,17 +73,20 @@ export class UserService {
    *
    * @public
    */
-  async createUser(input: CreateUserInput) {
+  async createUser(input: ICreateUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
 
       if (existingUser) {
-        throw new HttpException(USER_ERRORS.USER_EXISTS, HttpStatus.CONFLICT);
+        throw new HttpException(
+          USER_ERRORS.ALREADY_EXISTS_WITH_EMAIL,
+          HttpStatus.CONFLICT,
+        );
       }
 
-      const user = await new this.UserModel({ ...input }).save();
+      const user = await new this._userModel({ ...input }).save();
 
-      await this.authenticationService.userSignup(user, input.password);
+      await this._authenticationService.userSignup(user, input.password);
 
       return user;
     } catch (error) {
@@ -91,18 +102,15 @@ export class UserService {
    *
    * @public
    */
-  async updateUser(id: string, updateInput: UpdateUserInput): Promise<IUser> {
+  async updateUser(id: string, updateInput: IUpdateUserInput): Promise<IUser> {
     try {
-      const existingUser = await this.UserModel.findOne({ _id: id }).lean();
+      const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
-      const updatedUser = await this.UserModel.findOneAndUpdate(
+      const updatedUser = await this._userModel.findOneAndUpdate(
         {
           _id: id,
         },
@@ -114,7 +122,7 @@ export class UserService {
         },
       );
 
-      return updatedUser;
+      return updatedUser!;
     } catch (error) {
       throw makeError(error);
     }
@@ -129,20 +137,17 @@ export class UserService {
    */
   async deleteUser(id: string): Promise<IUser> {
     try {
-      const existingUser = await this.UserModel.findOne({ _id: id }).lean();
+      const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
-      const deletedUser = await this.UserModel.findOneAndDelete({
+      const deletedUser = await this._userModel.findOneAndDelete({
         _id: id,
       });
 
-      return deletedUser;
+      return deletedUser!;
     } catch (error) {
       throw makeError(error);
     }
@@ -153,18 +158,15 @@ export class UserService {
    * @param input - confirm user input including the verification code
    * @returns success message string
    */
-  async confirmUser(input: ConfirmUserInput) {
+  async confirmUser(input: IConfirmUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
-      const result = await this.authenticationService.confirmCode(
+      const result = await this._authenticationService.confirmCode(
         existingUser,
         input.code,
       );
@@ -183,18 +185,15 @@ export class UserService {
    * @public
    */
 
-  async loginUser(input: LoginUserInput) {
+  async loginUser(input: ILoginUserInput) {
     try {
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
-        throw new HttpException(
-          USER_ERRORS.USER_NOT_FOUND,
-          HttpStatus.NOT_FOUND,
-        );
+        throw new HttpException(USER_ERRORS.NOT_FOUND, HttpStatus.NOT_FOUND);
       }
 
-      const result = await this.authenticationService.userSignin(
+      const result = await this._authenticationService.userSignin(
         existingUser,
         input.password,
       );

@@ -2,7 +2,10 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { IsOptional, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
+// import { Ticket } from '../interfaces/ticket.interface';
+
 import { LocationInput } from './location.input';
+// import { CreateTicketInput } from './create-ticket.input';
 
 /**
  * defines the input schema for event updation
@@ -39,6 +42,12 @@ export class UpdateEventInput {
   /** event's category - an all alphabet string */
   @Field({ nullable: true })
   readonly category?: string;
+
+  @Field({ nullable: true })
+  readonly mainImageUrl?: string;
+
+  @Field(() => [String], { nullable: true })
+  readonly secondaryImageUrls?: string[];
 
   /** event's tags - an all alphabet string */
   @Field(() => [String], { nullable: true })

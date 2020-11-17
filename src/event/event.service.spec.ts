@@ -1,14 +1,14 @@
-/* eslint-disable no-underscore-dangle */
 /* eslint-disable max-classes-per-file */
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { Types } from 'mongoose';
 
+import { IEvent, IEventLean } from '@typings/index';
+
 import { EventService } from './event.service';
 import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
-import { IEvent } from './interfaces/event.interface';
 
 const mockConstructor = jest.fn();
 
@@ -58,7 +58,7 @@ describe('Event Service', () => {
   });
 
   describe('find all function', () => {
-    let result: IEvent[];
+    let result: IEventLean[];
     let mockedLean: jest.Mock<any[]>;
 
     beforeEach(async () => {
@@ -105,6 +105,7 @@ describe('Event Service', () => {
 
     describe('when called with correct data', () => {
       const mongoId = Types.ObjectId();
+      const userId = Types.ObjectId().toHexString();
       let result: IEvent;
 
       beforeEach(async () => {
@@ -114,7 +115,7 @@ describe('Event Service', () => {
           createdOn: Date.now(),
         });
 
-        result = await service.createEvent(createInput);
+        result = await service.createEvent(userId, createInput);
       });
 
       it('should call the EventModel save method and return correct result', () => {
@@ -130,7 +131,6 @@ describe('Event Service', () => {
         });
         expect(EventModelMock.prototype.save).toHaveBeenCalled();
         expect(result).toMatchObject(createInput);
-        // eslint-disable-next-line no-underscore-dangle
         expect(result._id).toBeDefined();
       });
     });
@@ -177,7 +177,7 @@ describe('Event Service', () => {
     });
 
     describe('when input data is correct', () => {
-      let result: IEvent;
+      let result: IEventLean;
 
       beforeEach(async () => {
         mockedLean = jest.fn(() => ({}));
@@ -212,8 +212,8 @@ describe('Event Service', () => {
             location: {
               type: 'Point',
               coordinates: [
-                updateInput.location.longitude,
-                updateInput.location.latitude,
+                updateInput.location!.longitude,
+                updateInput.location!.latitude,
               ],
             },
           },
@@ -258,7 +258,7 @@ describe('Event Service', () => {
     });
 
     describe('when input data is correct', () => {
-      let result: IEvent;
+      let result: IEventLean;
 
       beforeEach(async () => {
         mockedLean = jest.fn(() => ({}));

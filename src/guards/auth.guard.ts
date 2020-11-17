@@ -3,8 +3,6 @@ import {
   CanActivate,
   ExecutionContext,
   Inject,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import {
@@ -15,12 +13,12 @@ import {
 } from 'amazon-cognito-identity-js';
 import jwt from 'jwt-decode';
 
-import { UserService } from '../user/user.service';
+import { UserService } from '@/user/user.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
-    @Inject('UserService') private readonly userService: UserService,
+    @Inject('UserService') private readonly _userService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -30,7 +28,7 @@ export class AuthGuard implements CanActivate {
     const { idtoken, accesstoken, refreshtoken } = headers;
 
     if (idtoken && accesstoken && refreshtoken) {
-      const decoded = jwt(idtoken);
+      const decoded: any = jwt(idtoken);
       const username = decoded['cognito:username'];
 
       const idToken = new CognitoIdToken({
@@ -54,11 +52,7 @@ export class AuthGuard implements CanActivate {
       const session = new CognitoUserSession(tokenData);
 
       if (session.isValid()) {
-        const user = await this.userService.findOne(username);
-
-        if (!user) {
-          throw new HttpException('user not found', HttpStatus.NOT_FOUND);
-        }
+        const user = await this._userService.findOne(username);
 
         request.headers.user = JSON.stringify(user);
 
