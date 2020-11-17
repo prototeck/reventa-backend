@@ -34,9 +34,6 @@ export class UpdateEventInput {
 
   /** event's location - an all alphabet string */
   @Field(() => LocationInput, { nullable: true })
-  @Type(() => LocationInput)
-  @ValidateNested()
-  @IsOptional()
   readonly location?: LocationInput;
 
   /** event's category - an all alphabet string */
