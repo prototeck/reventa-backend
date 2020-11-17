@@ -1,5 +1,4 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNumberString } from 'class-validator';
 
 /**
  * defines the input schema for event address
@@ -19,7 +18,6 @@ export class AddressInput {
   readonly state!: string;
 
   @Field()
-  @IsNumberString()
   readonly zipCode!: string;
 
   @Field()

@@ -21,6 +21,10 @@ import { CreateEventInput } from './inputs/create-event.input';
 import { UpdateEventInput } from './inputs/update-event.input';
 import { CreateTicketInput } from './inputs/create-ticket.input';
 import { UpdateTicketInput } from './inputs/update-ticket.input';
+import {
+  validateCreateEventInput,
+  validateUpdateEventInput,
+} from './event.validations';
 
 @Injectable()
 export class EventService {
@@ -80,6 +84,8 @@ export class EventService {
    */
   async createEvent(userId: string, input: CreateEventInput) {
     try {
+      validateCreateEventInput(input);
+
       const event = await new this._eventModel({
         ...input,
         createdBy: userId,
@@ -108,6 +114,8 @@ export class EventService {
     updateInput: UpdateEventInput,
   ): Promise<IEventLean> {
     try {
+      validateUpdateEventInput(updateInput);
+
       const existingEvent = await this._eventModel.findOne({ _id: id }).lean();
 
       if (!existingEvent) {

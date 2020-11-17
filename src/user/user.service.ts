@@ -1,13 +1,14 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import Joi from 'joi';
 
 import { AuthenticationService } from '@/authentication/authentication.service';
-import { makeError } from '@/utils';
+import { makeError, joiValidate } from '@/utils';
 import { USER_ERRORS } from '@errors/index';
 import {
-  IUserLean,
   IUser,
+  IUserLean,
   ICreateUserInput,
   IConfirmUserInput,
   ILoginUserInput,
@@ -75,6 +76,18 @@ export class UserService {
    */
   async createUser(input: ICreateUserInput) {
     try {
+      joiValidate<ICreateUserInput>({
+        firstName: Joi.string()
+          .pattern(/^[A-Za-z]+$/)
+          .required(),
+        lastName: Joi.string()
+          .pattern(/^[A-Za-z]+$/)
+          .required(),
+        email: Joi.string()
+          .email()
+          .required(),
+      })(input);
+
       const existingUser = await this.findByEmail(input.email);
 
       if (existingUser) {
@@ -104,6 +117,11 @@ export class UserService {
    */
   async updateUser(id: string, updateInput: IUpdateUserInput): Promise<IUser> {
     try {
+      joiValidate<IUpdateUserInput>({
+        firstName: Joi.string().pattern(/^[A-Za-z]+$/),
+        lastName: Joi.string().pattern(/^[A-Za-z]+$/),
+      })(updateInput);
+
       const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
@@ -160,6 +178,13 @@ export class UserService {
    */
   async confirmUser(input: IConfirmUserInput) {
     try {
+      joiValidate<IConfirmUserInput>({
+        email: Joi.string()
+          .email()
+          .required(),
+        code: Joi.string().required(),
+      })(input);
+
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
@@ -184,9 +209,15 @@ export class UserService {
    *
    * @public
    */
-
   async loginUser(input: ILoginUserInput) {
     try {
+      joiValidate<ILoginUserInput>({
+        email: Joi.string()
+          .email()
+          .required(),
+        password: Joi.string().required(),
+      })(input);
+
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
