@@ -1,6 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import Joi from 'joi';
 
 import { AuthenticationService } from '@/authentication/authentication.service';
 import { makeError } from '@/utils';
@@ -75,6 +76,22 @@ export class UserService {
    */
   async createUser(input: ICreateUserInput) {
     try {
+      const response = Joi.object<ICreateUserInput>({
+        firstName: Joi.string()
+          .pattern(/^[A-Za-z]+$/)
+          .required(),
+        lastName: Joi.string()
+          .pattern(/^[A-Za-z]+$/)
+          .required(),
+        email: Joi.string()
+          .email()
+          .required(),
+      }).validate(input);
+
+      if (response.error) {
+        throw new HttpException(response.error.message, HttpStatus.BAD_REQUEST);
+      }
+
       const existingUser = await this.findByEmail(input.email);
 
       if (existingUser) {
@@ -104,6 +121,15 @@ export class UserService {
    */
   async updateUser(id: string, updateInput: IUpdateUserInput): Promise<IUser> {
     try {
+      const response = Joi.object<IUpdateUserInput>({
+        firstName: Joi.string().pattern(/^[A-Za-z]+$/),
+        lastName: Joi.string().pattern(/^[A-Za-z]+$/),
+      }).validate(updateInput);
+
+      if (response.error) {
+        throw new HttpException(response.error.message, HttpStatus.BAD_REQUEST);
+      }
+
       const existingUser = await this._userModel.findOne({ _id: id }).lean();
 
       if (!existingUser) {
@@ -160,6 +186,17 @@ export class UserService {
    */
   async confirmUser(input: IConfirmUserInput) {
     try {
+      const response = Joi.object<IConfirmUserInput>({
+        email: Joi.string()
+          .email()
+          .required(),
+        code: Joi.string().required(),
+      }).validate(input);
+
+      if (response.error) {
+        throw new HttpException(response.error.message, HttpStatus.BAD_REQUEST);
+      }
+
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
@@ -187,6 +224,17 @@ export class UserService {
 
   async loginUser(input: ILoginUserInput) {
     try {
+      const response = Joi.object<ILoginUserInput>({
+        email: Joi.string()
+          .email()
+          .required(),
+        password: Joi.string().required(),
+      }).validate(input);
+
+      if (response.error) {
+        throw new HttpException(response.error.message, HttpStatus.BAD_REQUEST);
+      }
+
       const existingUser = await this.findByEmail(input.email);
 
       if (!existingUser) {
